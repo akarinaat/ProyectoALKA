@@ -14,4 +14,20 @@ def test_declaracion_variables():
 
 def test_declaracion_funciones():
     ALKA_parser.parse(
-        """ func int foo () returns int {} """)  # Creo que está mal y el returns va dentro de los brackets --> faltan los parametros y los parámetros
+        """ func int foo () returns int {}
+        main(){}""")  # Creo que está mal y el returns va dentro de los brackets --> faltan los parametros y los parámetros
+
+
+# def test_asigmacion():
+#     ALKA_parser.parse("""  """)
+# print(
+#     ALKA_parser.parse(""" var int: a
+#                           main(){} """).pretty()
+# )
+
+def test_forloop():
+    ALKA_parser.parse(""" main(){
+        for a = i to (a < b) {
+        boo = t;
+    };
+    }""")

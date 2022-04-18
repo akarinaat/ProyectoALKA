@@ -15,25 +15,27 @@ from lark import tree
 
 # decfunc
 # print(
-#     ALKA_parser.parse(""" func int foo (a int) {
+#     ALKA_parser.parse(""" func int foo (a int) returns int {
 
-#             returns int
+
 #     }
 #       main(){} """).pretty()
 # )
 
 # asignacion
 # print(
-#     ALKA_parser.parse(""" var int: a;
+#     ALKA_parser.parse(""" var int: a
 #                           main(){} """).pretty()
 # )
 
 # forloop
 print(
-    ALKA_parser.parse(""" for a = i (a < b) {
+    ALKA_parser.parse(""" 
+    main(){
+        for a = i to (a < b) {
         boo = t;
-    } 
-    main(){}""").pretty()
+    };
+    }""").pretty()
 )
 
 

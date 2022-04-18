@@ -63,7 +63,7 @@ ALKA_parser = Lark(
 
     decfunc : FUNC tipo ID  LPAREN (ID tipo (COMMA ID tipo)*)? RPAREN RETURNS tipo LCURLYBRACKET  decvars estatutos RCURLYBRACKET
 
-    asignacion : llamadavariable ASSIGN expresion SEMICOLON
+    asignacion : llamadavariable ASSIGN expresion
 
     forloop : FOR ID ASSIGN expresion TO expresion LCURLYBRACKET estatutos "}"
 
