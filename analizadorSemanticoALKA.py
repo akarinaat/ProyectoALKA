@@ -1,6 +1,15 @@
+from xml.dom import SYNTAX_ERR
 from alkaparser import ALKA_parser
 
 from lark import Token, Tree, tree
+from dataclasses import dataclass
+
+
+@dataclass  # son para guardar información
+class Variable:
+
+    tipo: str
+    nombre: str
 
 
 class AnalizadorSemantico:
@@ -16,9 +25,20 @@ class AnalizadorSemantico:
                 self.declarar_variable(subtree)
 
     def declarar_variable(self, subtree: Tree) -> None:
-        tipo = subtree.children[1]
+        tipo = subtree.children[1].children[0]
+        print(tipo)
         ids = get_ids(subtree)
-        print(ids)
+        for id in ids:
+            # checar si ya existe la variable
+            if id in self.directorioVariables:
+                raise SyntaxError("ID ya existe")
+            else:
+                self.directorioVariables[id] = Variable(tipo, id)
+
+            # sisi sacar error
+            # sino meterla al directorio
+
+        # print(ids)
         # todo
         # Crear diccionario de variables
         # Crear diccionario de funciones
