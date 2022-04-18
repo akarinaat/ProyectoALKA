@@ -1,48 +1,40 @@
 from alkaparser import ALKA_parser
 
-from lark import tree
-
-# decvars
-# print(
-#     ALKA_parser.parse("""var int : num ;
-#                      var float : a, b;
-#                      main(){} """).pretty())
-
-# tree.pydot__tree_to_png(
-#     ALKA_parser.parse("""var int : num ;
-#                      var float : a, b;
-#                      main(){} """), "test.png")
-
-# decfunc
-# print(
-#     ALKA_parser.parse(""" func int foo (a int) returns int {
+from lark import Tree, tree
 
 
-#     }
-#       main(){} """).pretty()
-# )
+class AnalizadorSemantico:
 
-# asignacion
-# print(
-#     ALKA_parser.parse(""" var int: a
-#                           main(){} """).pretty()
-# )
+    def __init__(self, input) -> None:
+        self.directorioVariables = {}  # Directorio de variables
+        self.directorioFunciones = {}  # Directorio de funciones
+        self.arbol: Tree = ALKA_parser.parse(input)
 
-# forloop
-print(
-    ALKA_parser.parse(""" 
-    main(){
-        for a = i to (a < b) {
-        boo = t;
-    };
-    }""").pretty()
-)
+    def analizarArbol(self):
+        for subtree in self.arbol.iter_subtrees():
+            if subtree.data == "decvar":
+                self.declarar_variable(subtree)
+
+    def declarar_variable(self, subtree: Tree) -> None:
+        tipo = subtree.children[1]
+        ids = get_ids(subtree.children)
+        # todo
+        # Crear diccionario de variables
+        # Crear diccionario de funciones
+        # Crear funciones getter y setters
+        # Crear la clase de analizador semántico que va a contener los diccionarios
+
+        # TODO EXPRESION ESTÁ MAL
 
 
-# todo
-# Crear diccionario de variables
-# Crear diccionario de funciones
-# Crear funciones getter y setters
-# Crear la clase de analizador semántico que va a contener los diccionarios
+def get_ids(array_tokens):
+    print(array_tokens[3:-1:2])
 
-# TODO EXPRESION ESTÁ MAL
+
+programa = """var int : num, b ;
+                          
+                         main(){}"""
+
+analizador = AnalizadorSemantico(programa)
+
+analizador.analizarArbol()
