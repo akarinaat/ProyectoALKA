@@ -1,6 +1,6 @@
 from alkaparser import ALKA_parser
 
-from lark import Tree, tree
+from lark import Token, Tree, tree
 
 
 class AnalizadorSemantico:
@@ -17,7 +17,8 @@ class AnalizadorSemantico:
 
     def declarar_variable(self, subtree: Tree) -> None:
         tipo = subtree.children[1]
-        ids = get_ids(subtree.children)
+        ids = get_ids(subtree)
+        print(ids)
         # todo
         # Crear diccionario de variables
         # Crear diccionario de funciones
@@ -27,8 +28,12 @@ class AnalizadorSemantico:
         # TODO EXPRESION ESTÁ MAL
 
 
-def get_ids(array_tokens):
-    print(array_tokens[3:-1:2])
+def get_ids(subtree: Tree):
+    # print(array_tokens[3:-1:2])
+    return [token.value for token in filter(lambda t: t.type == "ID",
+                                            subtree.scan_values(
+                                                lambda v: isinstance(v, Token))  # Los tokens del subtree
+                                            )]
 
 
 programa = """var int : num, b ;
