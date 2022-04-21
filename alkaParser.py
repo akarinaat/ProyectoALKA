@@ -222,25 +222,25 @@ ALKA_parser = Lark(
     
     programa : decvars decfuncs main
 
-    main : MAIN "(" ")" "{" decvars estatutos "}"
+    main : "main" "(" ")" "{" decvars estatutos "}"
 
     decvars : decvar*
 
-    decvar:  VAR tipo ":" id ("," id)* ";"
+    decvar:  "var" tipo ":" id ("," id)* ";"
 
     decfuncs : decfunc*
 
-    decfunc : FUNC tipo id  "(" (id tipo ("," id tipo)*)? ")) RETURNS tipo "{" decvars estatutos "}"
+    decfunc : "func" tipo id  "(" (id tipo ("," id tipo)*)? ")) "returns" tipo "{" decvars estatutos "}"
 
     asignacion : llamadavariable "=" expresion
 
-    forloop : FOR id "=" expresion TO expresion "{" estatutos "}"
+    forloop : "for" id "=" expresion "to" expresion "{" estatutos "}"
 
-    while : WHILE "(" expresion ")" "{" estatutos "}"
+    while : ""while "(" expresion ")" "{" estatutos "}"
 
-    if : IF "(" expresion ")" "{" estatutos "}" else
+    if : "if" "(" expresion ")" "{" estatutos "}" else
 
-    else : (ELSE "{" estatutos "}")?
+    else : ("else" "{" estatutos "}")?
 
     estatutos : estatuto*
 
@@ -254,7 +254,7 @@ ALKA_parser = Lark(
 
     factor : "(" expresion ")" | ("+" | "-")? atomo
 
-    atomo : id | CTEF | CTEI | CTESTR | llamadafuncion | funcionesespeciales
+    atomo : id | "ctef" | "ctei" | "ctestr" | llamadafuncion | funcionesespeciales
 
     llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
