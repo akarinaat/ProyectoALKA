@@ -260,13 +260,13 @@ ALKA_parser = Lark(
 
     llamadavariable : id ("[" expresion "]" )*
 
-    tipo : INT | STRING | FLOAT | BOOL
+    tipo : "int" | "string" | "float" | "bool"
 
-    read : "write" "(" llamadavariable ")"
+    read : "read" "(" llamadavariable ")"
 
     write : "write" "(" expresion ( "," expresion )* ")"
 
-    funcionesespeciales : "read" | "write" | "hist" | "mean" | "mode" | "avg" | "variance
+    funcionesespeciales : "read" | "write" | "hist" | "mean" | "mode" | "avg" | "variance"
 
 
 
