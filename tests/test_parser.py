@@ -18,12 +18,13 @@ def test_declaracion_funciones():
         main(){}""")  # Creo que está mal y el returns va dentro de los brackets --> faltan los parametros y los parámetros
 
 
-# def test_asigmacion():
-#     ALKA_parser.parse("""  """)
-# print(
-#     ALKA_parser.parse(""" var int: a
-#                           main(){} """).pretty()
-# )
+def test_asignacion():
+
+    ALKA_parser.parse(""" var int: a;
+                          main(){
+                              a = 3;
+                          } """)
+
 
 def test_forloop():
     ALKA_parser.parse(""" main(){
@@ -31,3 +32,45 @@ def test_forloop():
         boo = t;
     };
     }""")
+
+
+def test_while():
+    ALKA_parser.parse(""" main() {
+        while( a == b){
+            a = 3;
+        };
+    } """)
+
+
+def test_if():
+    ALKA_parser.parse(""" main(){
+        if(a<b){
+            a=6;
+        };
+    } """)
+
+
+def test_else():
+    ALKA_parser.parse("""
+    main(){
+        if(a){
+            a =3;
+        }
+        else{
+
+        };
+    }
+    """)
+
+
+def test_exp():
+    ALKA_parser.parse("""main(){ a + b;} """)
+
+
+def test_llamada_funcion():
+    ALKA_parser.parse(""" main(){
+        read(a);
+        write(a);
+        hist(a);
+        }
+    """)

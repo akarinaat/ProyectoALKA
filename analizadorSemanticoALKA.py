@@ -1,5 +1,5 @@
 from xml.dom import SYNTAX_ERR
-from alkaparser import ALKA_parser
+from alkaparser import ALKA_parser, parse
 
 from lark import Token, Tree, tree
 from dataclasses import dataclass
@@ -10,6 +10,8 @@ class Variable:
 
     tipo: str
     nombre: str
+
+# de parse tree a ast ()
 
 
 class AnalizadorSemantico:
@@ -26,7 +28,6 @@ class AnalizadorSemantico:
 
     def declarar_variable(self, subtree: Tree) -> None:
         tipo = subtree.children[1].children[0]
-        print(tipo)
         ids = get_ids(subtree)
         for id in ids:
             # checar si ya existe la variable
@@ -35,17 +36,12 @@ class AnalizadorSemantico:
             else:
                 self.directorioVariables[id] = Variable(tipo, id)
 
-            # sisi sacar error
-            # sino meterla al directorio
-
         # print(ids)
         # todo
         # Crear diccionario de variables
         # Crear diccionario de funciones
         # Crear funciones getter y setters
         # Crear la clase de analizador semántico que va a contener los diccionarios
-
-        # TODO EXPRESION ESTÁ MAL
 
 
 def get_ids(subtree: Tree):
