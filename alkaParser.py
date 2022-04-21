@@ -226,15 +226,15 @@ ALKA_parser = Lark(
 
     decvars : decvar*
 
-    decvar:  VAR tipo COLON id (COMMA id)* SEMICOLON
+    decvar:  VAR tipo ":" id ("," id)* ";"
 
     decfuncs : decfunc*
 
-    decfunc : FUNC tipo id  LPAREN (id tipo (COMMA id tipo)*)? RPAREN RETURNS tipo LCURLYBRACKET  decvars estatutos RCURLYBRACKET
+    decfunc : FUNC tipo id  "(" (id tipo (COMMA id tipo)*)? ")) RETURNS tipo "{" decvars estatutos "}"
 
-    asignacion : llamadavariable ASSIGN expresion
+    asignacion : llamadavariable "=" expresion
 
-    forloop : FOR id ASSIGN expresion TO expresion LCURLYBRACKET estatutos "}"
+    forloop : FOR id "=" expresion TO expresion "{" estatutos "}"
 
     while : WHILE "(" expresion ")" "{" estatutos "}"
 
@@ -244,7 +244,7 @@ ALKA_parser = Lark(
 
     estatutos : estatuto*
 
-    estatuto : (asignacion | llamadafuncion | expresion | if | while | forloop) SEMICOLON 
+    estatuto : (asignacion | llamadafuncion | expresion | if | while | forloop) ";" 
 
     expresion : exp ((">" | "<" | "!=" | "==" ) exp )?
 
@@ -264,7 +264,7 @@ ALKA_parser = Lark(
 
     read : READ "(" llamadavariable ")"
 
-    write : WRITE "(" expresion ( COMMA expresion )* ")"
+    write : WRITE "(" expresion ( "," expresion )* ")"
 
     funcionesespeciales : READ | WRITE | HIST | MEAN | MODE | AVG | VARIANCE
 
