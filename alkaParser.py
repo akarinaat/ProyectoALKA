@@ -230,7 +230,7 @@ ALKA_parser = Lark(
 
     decfuncs : decfunc*
 
-    decfunc : FUNC tipo id  "(" (id tipo (COMMA id tipo)*)? ")) RETURNS tipo "{" decvars estatutos "}"
+    decfunc : FUNC tipo id  "(" (id tipo ("," id tipo)*)? ")) RETURNS tipo "{" decvars estatutos "}"
 
     asignacion : llamadavariable "=" expresion
 
@@ -262,11 +262,12 @@ ALKA_parser = Lark(
 
     tipo : INT | STRING | FLOAT | BOOL
 
-    read : READ "(" llamadavariable ")"
+    read : "write" "(" llamadavariable ")"
 
-    write : WRITE "(" expresion ( "," expresion )* ")"
+    write : "write" "(" expresion ( "," expresion )* ")"
 
-    funcionesespeciales : READ | WRITE | HIST | MEAN | MODE | AVG | VARIANCE
+    funcionesespeciales : "read" | "write" | "hist" | "mean" | "mode" | "avg" | "variance
+
 
 
     ''',
