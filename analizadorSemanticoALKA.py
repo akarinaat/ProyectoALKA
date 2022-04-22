@@ -1,5 +1,5 @@
 from xml.dom import SYNTAX_ERR
-from alkaparser import ALKA_parser, parse
+from alkaparser import ALKA_parser
 
 from lark import Token, Tree, tree
 from dataclasses import dataclass
@@ -25,6 +25,8 @@ class AnalizadorSemantico:
         for subtree in self.arbol.iter_subtrees():
             if subtree.data == "decvar":
                 self.declarar_variable(subtree)
+                if subtree.data == "decfunc":
+                    self.declarar_funcion(subtree)
 
     def declarar_variable(self, subtree: Tree) -> None:
         tipo = subtree.children[1].children[0]
@@ -36,12 +38,20 @@ class AnalizadorSemantico:
             else:
                 self.directorioVariables[id] = Variable(tipo, id)
 
+    def declarar_funcion(self, subtree: Tree) -> None:
+        print(subtree)
+        # tipo = subtree.children[1].children[0]
+        # ids = get_ids(subtree)
+        # for id in ids:
+        #     # checar si ya existe la variable
+        #     if id in self.directorioVariables:
+        #         raise SyntaxError("ID ya existe")
+        #     else:
+        #         self.directorioVariables[id] = Variable(tipo, id)
+
         # print(ids)
         # todo
-        # Crear diccionario de variables
-        # Crear diccionario de funciones
         # Crear funciones getter y setters
-        # Crear la clase de analizador semántico que va a contener los diccionarios
 
 
 def get_ids(subtree: Tree):
@@ -53,8 +63,8 @@ def get_ids(subtree: Tree):
 
 
 programa = """var int : num, b ;
-                          
-                         main(){}"""
+						  
+						 main(){}"""
 
 analizador = AnalizadorSemantico(programa)
 
