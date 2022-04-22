@@ -69,13 +69,13 @@ ALKA_parser = Lark(
 
     decfuncs : decfunc*
 
-    decfunc : "func" tipo id  "(" (id tipo ("," id tipo)*)? ")) "returns" tipo "{" decvars estatutos "}"
+    decfunc : "func" tipo id  "(" (id tipo ("," id tipo)*)? ")"  "{" decvars estatutos "}"
 
     asignacion : llamadavariable "=" expresion
 
     forloop : "for" id "=" expresion "to" expresion "{" estatutos "}"
 
-    while : ""while "(" expresion ")" "{" estatutos "}"
+    while : "while" "(" expresion ")" "{" estatutos "}"
 
     if : "if" "(" expresion ")" "{" estatutos "}" else
 
@@ -112,5 +112,3 @@ ALKA_parser = Lark(
     ''',
     start='programa'
 )
-
-

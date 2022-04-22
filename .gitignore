@@ -1,2 +1,4 @@
 /.DS_Store
 /.vscode
+**/**.pyc
+tests/__pycache__/test_parser.cpython-39-pytest-7.1.1.pyc

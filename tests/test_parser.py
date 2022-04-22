@@ -54,7 +54,7 @@ def test_else():
     ALKA_parser.parse("""
     main(){
         if(a){
-            a =3;
+            a = 3;
         }
         else{
 
