@@ -26,11 +26,20 @@ class AnalizadorSemantico:
         self.arbol: Tree = ALKA_parser.parse(input)
 
     def analizarArbol(self):
-        for subtree in self.arbol.iter_subtrees():
-            if subtree.data == "decvar":
-                self.analizar_decvar(subtree)
-            elif subtree.data == "decfunc":
-                self.analizar_decfunc(subtree)
+        for subtree in self.arbol.children:
+            # print(subtree)
+            if subtree.data == "decvars":
+                self.analizar_decvars(subtree)
+            elif subtree.data == "decfuncs":
+                self.analizar_decfuncs(subtree)
+
+    def analizar_decvars(self, subtree: Tree) -> None:
+        for decvar in subtree.children:
+            self.analizar_decvar(decvar)
+
+    def analizar_decfuncs(self, subtree: Tree) -> None:
+        for decfunc in subtree.children:
+            self.analizar_decfunc(decfunc)
 
     def analizar_decvar(self, subtree: Tree) -> None:
         tipo = subtree.children[0].children[0]
@@ -63,7 +72,19 @@ class AnalizadorSemantico:
             tipo_argumento = argumento[1].children[0]
             self.declarar_variable(nombre_argumento, tipo_argumento)
             print(nombre_argumento, tipo_argumento)
-            # analizar el cuerpo de la función
+
+        decvars = subtree.children[-2]
+        estatutos = subtree.children[-1]
+
+        for decvar in decvars.children:
+            self.analizar_decvar(decvar)
+
+        for estatuto in estatutos:
+            self.analizar_estatuto(estatuto)
+        # analizar el cuerpo de la función
+
+    def analizar_estatuto(self, subtree: Tree) -> None:
+        pass
 
 
 def get_token(subtree: Tree, token_type: str):
