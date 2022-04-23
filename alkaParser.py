@@ -93,13 +93,13 @@ ALKA_parser = Lark(
 
     factor : "(" expresion ")" | ("+" | "-")? atomo
 
-    atomo : id | "ctef" | "ctei" | "ctestr" | llamadafuncion | funcionesespeciales
+    atomo : id | CTEF | CTESTR | CTEI | llamadafuncion | funcionesespeciales
 
     llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
     llamadavariable : id ("[" expresion "]" )*
 
-    tipo : "int" | "string" | "float" | "bool"
+    tipo : INT | STRING | FLOAT | BOOL
 
     read : "read" "(" llamadavariable ")"
 

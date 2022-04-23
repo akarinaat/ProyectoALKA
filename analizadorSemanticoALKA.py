@@ -11,7 +11,12 @@ class Variable:
     tipo: str
     nombre: str
 
-# de parse tree a ast ()
+
+@dataclass
+class Funcion:
+
+    tipo: str
+    nombre: str
 
 
 class AnalizadorSemantico:
@@ -25,11 +30,12 @@ class AnalizadorSemantico:
         for subtree in self.arbol.iter_subtrees():
             if subtree.data == "decvar":
                 self.declarar_variable(subtree)
-                if subtree.data == "decfunc":
-                    self.declarar_funcion(subtree)
+            elif subtree.data == "decfunc":
+                self.declarar_funcion(subtree)
 
     def declarar_variable(self, subtree: Tree) -> None:
-        tipo = subtree.children[1].children[0]
+        tipo = subtree.children[0].children[0]
+        print(subtree)
         ids = get_ids(subtree)
         for id in ids:
             # checar si ya existe la variable
@@ -39,33 +45,17 @@ class AnalizadorSemantico:
                 self.directorioVariables[id] = Variable(tipo, id)
 
     def declarar_funcion(self, subtree: Tree) -> None:
-        print(subtree)
-        # tipo = subtree.children[1].children[0]
-        # ids = get_ids(subtree)
-        # for id in ids:
-        #     # checar si ya existe la variable
-        #     if id in self.directorioVariables:
-        #         raise SyntaxError("ID ya existe")
-        #     else:
-        #         self.directorioVariables[id] = Variable(tipo, id)
-
-        # print(ids)
-        # todo
-        # Crear funciones getter y setters
+        print(subtree.pretty())
+        tipo = subtree.children[0].children[0]
+        nombre = subtree.children[1].children[0]
+        if nombre in self.directorioFunciones:
+            raise SyntaxError("funcion ya existe")
+        else:
+            self.directorioFunciones[nombre] = Funcion(tipo, nombre)
 
 
 def get_ids(subtree: Tree):
-    # print(array_tokens[3:-1:2])
     return [token.value for token in filter(lambda t: t.type == "ID",
                                             subtree.scan_values(
                                                 lambda v: isinstance(v, Token))  # Los tokens del subtree
                                             )]
-
-
-programa = """var int : num, b ;
-						  
-						 main(){}"""
-
-analizador = AnalizadorSemantico(programa)
-
-analizador.analizarArbol()

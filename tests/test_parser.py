@@ -14,7 +14,7 @@ def test_declaracion_variables():
 
 def test_declaracion_funciones():
     ALKA_parser.parse(
-        """ func int foo () returns int {}
+        """ func int foo () {}
         main(){}""")  # Creo que está mal y el returns va dentro de los brackets --> faltan los parametros y los parámetros
 
 
