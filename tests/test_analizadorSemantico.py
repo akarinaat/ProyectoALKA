@@ -10,12 +10,9 @@ def test_analisis_decvar():
 
     analizador = AnalizadorSemantico(programa)
     analizador.analizarArbol()
-
-    assert "num" in analizador.directorioVariables
-    print(analizador.directorioVariables["num"])
-    assert analizador.directorioVariables["num"].tipo == "int"
-    assert "b" in analizador.directorioVariables
-    assert analizador.directorioVariables["b"].tipo == "int"
+    print(analizador.directoriosVariables)
+    assert analizador.directoriosVariables[0]["num"].tipo == "int"
+    assert analizador.directoriosVariables[0]["b"].tipo == "int"
 
 
 def test_analisis_decfunc():
@@ -28,3 +25,40 @@ def test_analisis_decfunc():
 
     assert "foo" in analizador.directorioFunciones
     assert analizador.directorioFunciones["foo"].tipo == "int"
+
+
+def test_analisis_decfunc_error():
+    programa = """
+        var int:a;
+        func int foo (a int,b float) {
+            var float: c;
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SyntaxError):
+        analizador.analizarArbol()
+
+    programa = """
+        var int:a;
+        func int foo () {
+            var int:a;
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SyntaxError):
+        analizador.analizarArbol()
+
+    programa = """
+        func int foo (a int) {
+            var int:a;
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SyntaxError):
+        analizador.analizarArbol()
