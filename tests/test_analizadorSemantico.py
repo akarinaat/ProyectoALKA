@@ -67,8 +67,8 @@ def test_analisis_decfunc_error():
 def test_variable_no_declarada():
     programa = """
         func int foo (a int) {
-            
-            b+2+3-2+1;
+
+            (b)+2+3-2+1;
         }
         main(){}"""
 
