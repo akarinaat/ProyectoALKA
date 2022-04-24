@@ -9,7 +9,6 @@ from dataclasses import dataclass
 class SemanticError(Exception):
     pass
 
-
 @dataclass  # son para guardar información
 class Variable:
 
@@ -119,15 +118,27 @@ class AnalizadorSemantico:
             raise SemanticError("Expresion mal formada")
 
     def analizar_exp(self, exp: Tree):
-        pass
+        print(len(exp.children[::2]))
+        lista_terminos = exp.children[::2]
+        tipo = self.analizar_termino(lista_terminos[0])   
+        for termino in lista_terminos[1:]: # para que no se cheque el primero dos veces
+            if self.analizar_termino(termino) != tipo:
+                raise SemanticError("Tipos incompatibles")
+        
+        return tipo
+        
 
+
+    def analizar_termino(self, termino:Tree ):
+        
+
+        pass
 
 def get_token(subtree: Tree, token_type: str):
     return [token.value for token in filter(lambda t: t.type == token_type,
                                             subtree.scan_values(
                                                 lambda v: isinstance(v, Token))  # Los tokens del subtree
                                             )]
-
 
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
