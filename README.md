@@ -50,3 +50,32 @@ Ejemplo:
 
 Fecha de entrega: Abril 13 2022
 
+
+En esta segunda fase se entrega lo siguiente:
+
+Un analizador semántico que contiene:
+
+ - El directorio de variables
+ - El directorio de funciones
+ - El cubo semántico
+
+ Se analizan las reglas decvars, decfuncs, decvar, decfunc, estatutos, estatuto, exp, expresion, término, factor y átomo.
+
+ También agregué pruebas para comprobar la funcionalidad del analizador.
+
+Ejemplo de una prueba:
+
+def test_variable_no_declarada():
+    programa = """
+        func int foo (a int) {
+
+            (b)+2+3-2+1;
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SemanticError):
+        analizador.analizarArbol()
+
+ Fecha de entrega: Abril 24 del 2022

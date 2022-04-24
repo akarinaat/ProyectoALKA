@@ -1,7 +1,5 @@
-
 from typing import List
 from alkaparser import ALKA_parser
-
 from lark import Token, Tree, tree
 from dataclasses import dataclass
 
@@ -27,7 +25,8 @@ class Funcion:
 class AnalizadorSemantico:
 
     def __init__(self, input) -> None:
-        self.directoriosVariables = [{}]  # Directorio de variables
+        # Directorio de variables, en lista para poder analizar las globales y las locales
+        self.directoriosVariables = [{}]
         self.directorioFunciones = {}  # Directorio de funciones
         self.arbol: Tree = ALKA_parser.parse(input)
 
@@ -125,7 +124,7 @@ class AnalizadorSemantico:
         if len(factor.children) == 1:
             expresion = factor.children[0]
             if expresion.data == "expresion":
-               return self.analizar_expresion(expresion)
+                return self.analizar_expresion(expresion)
             else:
                 return self.analizar_atomo(expresion)
         elif len(factor.children) == 2:
@@ -133,11 +132,11 @@ class AnalizadorSemantico:
             return self.analizar_atomo(atomo)
 
         else:
-            raise SemanticError("Factor mal formad")
+            raise SemanticError("Factor mal formado")
 
     def analizar_atomo(self, atomo: Tree):
         atomo = atomo.children[0]
-        if isinstance(atomo, Token):           
+        if isinstance(atomo, Token):
             print(atomo.type)
             if atomo.type == "CTEI":
                 return "int"
@@ -147,8 +146,6 @@ class AnalizadorSemantico:
                 return "string"
         else:
             print("no es token")
-         
-        
 
     def analizar_operacion_binaria(self, operacion: Tree, funcion):
         lista_operandos = operacion.children[::2]
