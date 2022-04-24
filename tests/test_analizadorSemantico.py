@@ -1,6 +1,6 @@
 import pytest
 
-from analizadorSemanticoALKA import AnalizadorSemantico
+from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
 
 
 def test_analisis_decvar():
@@ -37,7 +37,7 @@ def test_analisis_decfunc_error():
 
     analizador = AnalizadorSemantico(programa)
 
-    with pytest.raises(SyntaxError):
+    with pytest.raises(SemanticError):
         analizador.analizarArbol()
 
     programa = """
@@ -49,7 +49,7 @@ def test_analisis_decfunc_error():
 
     analizador = AnalizadorSemantico(programa)
 
-    with pytest.raises(SyntaxError):
+    with pytest.raises(SemanticError):
         analizador.analizarArbol()
 
     programa = """
@@ -60,5 +60,18 @@ def test_analisis_decfunc_error():
 
     analizador = AnalizadorSemantico(programa)
 
-    with pytest.raises(SyntaxError):
+    with pytest.raises(SemanticError):
+        analizador.analizarArbol()
+
+
+def test_variable_no_declarada():
+    programa = """
+        func int foo (a int) {
+            b>3;
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SemanticError):
         analizador.analizarArbol()

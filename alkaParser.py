@@ -21,7 +21,8 @@ ALKA_parser = Lark(
     RCURLYBRACKET : "}"
     LT : "<"
     GT : ">"
-    NOTEQ : "<>"
+    NOTEQ : "!="
+    EQ: "=="
     PLUS : "+"
     MINUS : "-"
     TIMES : "*"
@@ -83,15 +84,17 @@ ALKA_parser = Lark(
 
     estatutos : estatuto*
 
-    estatuto : (asignacion | llamadafuncion | expresion | if | while | forloop) ";" 
+    estatuto : (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";" 
 
-    expresion : exp ((">" | "<" | "!=" | "==" ) exp )?
+    return : "return" expresion
 
-    exp : termino (("+" | "-" ) termino )*
+    expresion : exp ((GT | LT | NOTEQ | EQ ) exp )?
 
-    termino : factor (("*" | "/") factor )*
+    exp : termino ((PLUS | MINUS ) termino )*
 
-    factor : "(" expresion ")" | ("+" | "-")? atomo
+    termino : factor (( TIMES | DIVIDE ) factor )*
+
+    factor : "(" expresion ")" | (PLUS | MINUS)? atomo
 
     atomo : id | CTEF | CTESTR | CTEI | llamadafuncion | funcionesespeciales
 
