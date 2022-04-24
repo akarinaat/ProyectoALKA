@@ -95,15 +95,31 @@ class AnalizadorSemantico:
         if estatuto.children[0].data == "expresion":
             self.analizar_expresion(estatuto.children[0])
 
-#regresa booleano si es > o < else el tipo de la exp
+# regresa booleano si es > o < else el tipo de la exp
     def analizar_expresion(self, expresion: Tree):
         print(expresion.pretty())
         if len(expresion.children) == 1:
+            exp = expresion.children[0]
+            print(exp, "el EXP")
             print("one child")
+            return self.analizar_exp(exp)
+            # si es una comoparación
         elif len(expresion.children) == 3:
-            print("3 children")
+            exp1 = expresion.children[0]
+            exp2 = expresion.children[2]
+            tipo_exp1 = self.analizar_exp(exp1)
+            tipo_exp2= self.analizar_exp(exp2)
+
+            if tipo_exp1 == tipo_exp2:
+                return "bool"
+            else:
+                raise SemanticError("No se pueden comparar")
+
         else:
             raise SemanticError("Expresion mal formada")
+
+    def analizar_exp(self, exp: Tree):
+        pass
 
 
 def get_token(subtree: Tree, token_type: str):
