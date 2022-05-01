@@ -3,10 +3,8 @@ from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
 from dataclasses import dataclass
 
-
 class SemanticError(Exception):
     pass
-
 
 @dataclass  # son para guardar información
 class Variable:
