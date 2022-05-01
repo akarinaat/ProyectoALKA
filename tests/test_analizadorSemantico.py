@@ -4,7 +4,18 @@ from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
 
 
 def test_analisis_decvar():
-    programa = """var int : num, b ;
+    programa = """var int : num , b ;
+						  
+						 main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+    analizador.analizarArbol()
+    print(analizador.directoriosVariables)
+    assert analizador.directoriosVariables[0]["num"].tipo == "int"
+    assert analizador.directoriosVariables[0]["b"].tipo == "int"
+
+def test_analisis_decvar_dimensiones():
+    programa = """var int : num[2][3], b ;
 						  
 						 main(){}"""
 

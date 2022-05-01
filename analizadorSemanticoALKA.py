@@ -13,6 +13,7 @@ class Variable:
 
     tipo: str
     nombre: str
+    dimensiones: int
 
 
 @dataclass
@@ -48,17 +49,22 @@ class AnalizadorSemantico:
 
     def analizar_decvar(self, subtree: Tree) -> None:
         tipo = subtree.children[0].children[0]
-        ids = get_token(subtree, "ID")
-        for nombre in ids:
-            self.declarar_variable(nombre, tipo)
+        variables = subtree.children[1:]
 
-    def declarar_variable(self, nombre, tipo):
+        for variable in variables:
+            nombre = variable.children[0].children[0]
+            len_dimensiones = len(variable.children[1:])
+            self.declarar_variable(nombre, tipo, len_dimensiones)
+            # print(variable.pretty())
+
+
+    def declarar_variable(self, nombre, tipo: str, dimensiones: int):
         # checar si ya existe la variable en la lista de directorios
         for directorio in self.directoriosVariables:
             if nombre in directorio:
                 raise SemanticError("ID ya existe")
         # Si no existe declararlo en el último directorio (-1)
-        self.directoriosVariables[-1][nombre] = Variable(tipo, nombre)
+        self.directoriosVariables[-1][nombre] = Variable(tipo, nombre, dimensiones)
 
     def analizar_decfunc(self, subtree: Tree) -> None:
 
@@ -74,7 +80,7 @@ class AnalizadorSemantico:
         for argumento in chunker(subtree.children[2:-2], 2):
             nombre_argumento = argumento[0].children[0]
             tipo_argumento = argumento[1].children[0]
-            self.declarar_variable(nombre_argumento, tipo_argumento)
+            self.declarar_variable(nombre_argumento, tipo_argumento, 0)
 
         decvars = subtree.children[-2]
         estatutos = subtree.children[-1].children

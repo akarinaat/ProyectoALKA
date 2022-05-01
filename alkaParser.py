@@ -66,7 +66,7 @@ ALKA_parser = Lark(
 
     decvars : decvar*
 
-    decvar:  "var" tipo ":" id ("," id)* ";"
+    decvar:  "var" tipo ":" llamadavariable ("," llamadavariable)* ";"
 
     decfuncs : decfunc*
 
