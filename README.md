@@ -59,9 +59,19 @@ Un analizador semántico que contiene:
  - El directorio de funciones
  - El cubo semántico
 
- Se analizan las reglas decvars, decfuncs, decvar, decfunc, estatutos, estatuto, exp, expresion, término, factor y átomo.
+ Análisis semántico de:
+ * decvars
+ * decfuncs 
+ * decvar
+ * decfunc
+ * estatutos
+ * estatuto
+ * exp
+ * expresion
+ * termino
+ * factor
 
- También agregué pruebas para comprobar la funcionalidad del analizador.
+También agregué pruebas para comprobar la funcionalidad del analizador.
 
 Ejemplo de una prueba:
 
@@ -79,3 +89,19 @@ def test_variable_no_declarada():
         analizador.analizarArbol()
 
  Fecha de entrega: Abril 24 del 2022
+
+ Tercera entrega:
+
+ - Generación de cuadruplos
+ - Generación de cuadruplos main
+ - Generación cuadruplos expresion
+ - Generación cuadruplos estatutos en progreso
+ - Agregué variables multidimiensionales : a[][]
+ - Análisis semántico de atomo
+
+ Falta la generación de cuadruplos estatutos:
+ - asignacion, llamadafuncion, if, while, forloop, return
+ Faltan atomos especiales como:
+ - funciones especiales, llamadafuncion, llamadavariable
+
+ Fecha de entrega: Mayo 1 del 2022
