@@ -132,7 +132,7 @@ class AnalizadorSemantico:
             else:
                 return self.analizar_atomo(expresion)
         elif len(factor.children) == 2:
-            atomo = factor.children[2]
+            atomo = factor.children[1]
             return self.analizar_atomo(atomo)
 
         else:

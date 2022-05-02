@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from analizadorSemanticoALKA import AnalizadorSemantico
-from lark import Tree
+from lark import Token, Tree
 
 @dataclass
 class Cuadruplo:
@@ -30,7 +30,7 @@ class GeneracionCuadruplos:
 
 
     def generar_cuadruplo_nuevo(self,operacion,operando_izq,operando_der):
-            temporal_actual = "t" + self.get_temporal()
+            temporal_actual = "t" + str(self.get_temporal())
             cuadruplo = Cuadruplo(operacion,operando_izq,operando_der,temporal_actual)
             self.listaCuadruplos.append(cuadruplo)
             return temporal_actual
@@ -81,7 +81,7 @@ class GeneracionCuadruplos:
 
 
     def generar_cuadruplos_expresion(self, expresion: Tree):
-        print(expresion.data)
+        
         if len(expresion.children) == 1:
             exp = expresion.children[0]
             self.generar_cuadruplos_exp(exp)
@@ -93,25 +93,75 @@ class GeneracionCuadruplos:
             operando_der = self.generar_cuadruplos_exp(exp_der)
 
             #Generar cuadruplo
-            self.generar_cuadruplo_nuevo(operacion, operando_izq,operando_der)
-
+            return self.generar_cuadruplo_nuevo(operacion, operando_izq,operando_der)
+            
     def generar_cuadruplos_exp(self, exp):
-        print(exp.pretty())
+       
         lista_terminos = exp.children[::2].copy()
         lista_operaciones = exp.children[1::2].copy()
 
-        while operacion := lista_operaciones.pop(0):
-            termino_izq = lista_terminos.pop(0)
-            termino_der = lista_terminos.pop(1)
-            operando_izq = self.generar_cuadruplos_termino(termino_izq)
+        arbol_termino_izq = lista_terminos.pop(0)
+        valor_termino_izq = self.generar_cuadruplos_termino(arbol_termino_izq)
+    
+        while len(lista_operaciones) > 0:
+
+            operacion = lista_operaciones.pop(0)
+            termino_der = lista_terminos.pop(0)
             operando_der = self.generar_cuadruplos_termino(termino_der)
-            resultado = self.generar_cuadruplo_nuevo(operacion, operando_izq, operando_der)
+            valor_termino_izq = self.generar_cuadruplo_nuevo(operacion, valor_termino_izq, operando_der)
+            
             #insertar resultado en stack
+        return valor_termino_izq
             
     def generar_cuadruplos_termino(self, termino):
 
-        pass
+        lista_factores = termino.children[::2].copy()
+        lista_operaciones = termino.children[1::2].copy()
+        arbol_factor_izq = lista_factores.pop(0)
+        valor_factor_izq = self.generar_cuadruplos_factor(arbol_factor_izq)
+       
+       
+        while len(lista_operaciones) > 0:
+            operacion = lista_operaciones.pop(0)
+            arbol_termino_der = lista_factores.pop(0)
+            valor_factor_der = self.generar_cuadruplos_factor(arbol_termino_der)
+            valor_factor_izq = self.generar_cuadruplo_nuevo(operacion, valor_factor_izq, valor_factor_der)
+        return valor_factor_izq
+     
+    # factor "(" expresion ")" | (PLUS | MINUS)? atomo
 
-        # 1 + 2 + 3 + 4
+    def generar_cuadruplos_factor(self, arbol_factor:Tree):
+        print(arbol_factor)
+        if len(arbol_factor.children) == 1:
+            expresion = arbol_factor.children[0]
+            if expresion.data == "expresion":
+                return self.generar_cuadruplos_expresion(expresion)
+            else:
+                return self.generar_cuadruplos_atomo(expresion)
+        elif len(arbol_factor.children) == 2:
+            atomo = arbol_factor.children[1]
+            valor_atomo = self.generar_cuadruplos_atomo(atomo)
+            operacion = arbol_factor.children[0]
 
+            return self.generar_cuadruplo_nuevo(operacion, valor_atomo, "")
+           
+    
+# atomo : llamadavariable | CTEF | CTESTR | CTEI | llamadafuncion | funcionesespeciales
+    
+    def generar_cuadruplos_atomo(self, atomo):
+        print(atomo.data)
+        
+        atomo = atomo.children[0]
+        if isinstance(atomo, Token):
+            print(atomo.type)
+            if atomo.type == "CTEI":
+                return int(atomo)
+            elif atomo.type == "CTEF":
+                return float(atomo)
+            elif atomo.type == "CTESTR":
+                return atomo
+        else:
+            print("no es token")
+            
+       
     
