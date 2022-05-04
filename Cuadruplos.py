@@ -19,7 +19,6 @@ class GeneracionCuadruplos:
 
         self.analizador = AnalizadorSemantico(programa)
         self.analizador.analizarArbol()
-        
         self.arbol = self.analizador.arbol
     
     def get_temporal(self): 
@@ -97,6 +96,7 @@ class GeneracionCuadruplos:
             
     def generar_cuadruplos_exp(self, exp):
        
+        print(exp)
         lista_terminos = exp.children[::2].copy()
         lista_operaciones = exp.children[1::2].copy()
 

@@ -87,3 +87,21 @@ def test_variable_no_declarada():
 
     with pytest.raises(SemanticError):
         analizador.analizarArbol()
+
+def test_variable_dimensiones_incorrectas():
+    programa = """
+        func int foo (a int) {
+
+            var int: i[2][3];
+            i[1][3][2];
+        }
+        main(){}"""
+
+    analizador = AnalizadorSemantico(programa)
+
+    with pytest.raises(SemanticError):
+        analizador.analizarArbol()
+  
+
+
+#Pruebas de 

@@ -1,3 +1,4 @@
+from cmath import nan
 from typing import List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
@@ -51,6 +52,7 @@ class AnalizadorSemantico:
 
         for variable in variables:
             nombre = variable.children[0].children[0]
+            #Encontrar con cuantas dimensiones tiene la variable
             len_dimensiones = len(variable.children[1:])
             self.declarar_variable(nombre, tipo, len_dimensiones)
             # print(variable.pretty())
@@ -62,7 +64,7 @@ class AnalizadorSemantico:
             if nombre in directorio:
                 raise SemanticError("ID ya existe")
         # Si no existe declararlo en el último directorio (-1)
-        self.directoriosVariables[-1][nombre] = Variable(tipo, nombre, dimensiones)
+        self.directoriosVariables[-1][str(nombre)] = Variable(tipo, str(nombre), dimensiones)
 
     def analizar_decfunc(self, subtree: Tree) -> None:
 
@@ -149,7 +151,41 @@ class AnalizadorSemantico:
             elif atomo.type == "CTESTR":
                 return "string"
         else:
-            print("no es token")
+            if atomo.data == "llamadavariable":
+               # print(atomo.pretty())
+                print(self.directoriosVariables)
+                nombre_variable = str(atomo.children[0].children[0])
+                print(nombre_variable)
+                # Checar que esté declarada
+                variable = None
+                for directorio in self.directoriosVariables:
+                    if nombre_variable in directorio:
+                        variable = directorio[nombre_variable]
+                        break
+                if variable is None:
+                    raise SemanticError("Error, la variable no esta declarada")
+                # Checar que se llame con la cantidad de dimensiones correcta (por ejemplo si es una matriz de dos dimensiones)
+                print(variable)
+                len_dimensiones = len(atomo.children[1:])
+                print(len_dimensiones)
+                if len_dimensiones != variable.dimensiones:
+                    raise SemanticError("Dimensiones incorrectas")
+                else:
+                    #Tengo que confirmar que son del mismo tipo, ejemplo 2+2 = int+int
+                    # Es lo último que se verifica (en la gramática)
+                    return variable.tipo      
+
+                #que efectivamente si tenga las 2 dimensiones
+                
+            if atomo.data == "llamadafuncion":
+                #Checar que la función esté declarada
+                #Que tiene la cantidad correcta de argumentos
+                #Checar que los argumentos tengan el tipo correcto
+                pass
+            if atomo.data == "funcionesespeciales":
+                #Checar que se llame con el tipo correcto
+                pass
+                
 
     def analizar_operacion_binaria(self, operacion: Tree, funcion):
         lista_operandos = operacion.children[::2]
