@@ -1,6 +1,6 @@
 import pytest
 
-from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
+from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError, Tipo
 
 
 def test_analisis_decvar():
@@ -11,8 +11,9 @@ def test_analisis_decvar():
     analizador = AnalizadorSemantico(programa)
     analizador.analizarArbol()
     print(analizador.directoriosVariables)
-    assert analizador.directoriosVariables[0]["num"].tipo == "int"
-    assert analizador.directoriosVariables[0]["b"].tipo == "int"
+    assert analizador.directoriosVariables[0]["num"].tipo == Tipo.Int
+    assert analizador.directoriosVariables[0]["b"].tipo == Tipo.Int
+
 
 def test_analisis_decvar_dimensiones():
     programa = """var int : num[2][3], b ;
@@ -22,8 +23,8 @@ def test_analisis_decvar_dimensiones():
     analizador = AnalizadorSemantico(programa)
     analizador.analizarArbol()
     print(analizador.directoriosVariables)
-    assert analizador.directoriosVariables[0]["num"].tipo == "int"
-    assert analizador.directoriosVariables[0]["b"].tipo == "int"
+    assert analizador.directoriosVariables[0]["num"].tipo == Tipo.Int
+    assert analizador.directoriosVariables[0]["b"].tipo == Tipo.Int
 
 
 def test_analisis_decfunc():
@@ -35,7 +36,7 @@ def test_analisis_decfunc():
     analizador.analizarArbol()
 
     assert "foo" in analizador.directorioFunciones
-    assert analizador.directorioFunciones["foo"].tipo == "int"
+    assert analizador.directorioFunciones["foo"].tipo == Tipo.Int
 
 
 def test_analisis_decfunc_error():
@@ -88,6 +89,7 @@ def test_variable_no_declarada():
     with pytest.raises(SemanticError):
         analizador.analizarArbol()
 
+
 def test_variable_dimensiones_incorrectas():
     programa = """
         func int foo (a int) {
@@ -101,7 +103,6 @@ def test_variable_dimensiones_incorrectas():
 
     with pytest.raises(SemanticError):
         analizador.analizarArbol()
-  
 
 
-#Pruebas de 
+# Pruebas de

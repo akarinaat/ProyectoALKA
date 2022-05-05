@@ -3,9 +3,19 @@ from typing import List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
 from dataclasses import dataclass
+from enum import Enum
+
 
 class SemanticError(Exception):
     pass
+
+
+class Tipo(Enum):
+    Float = "float"
+    Int = "int"
+    String = "string"
+    Bool = "bool"
+
 
 @dataclass  # son para guardar información
 class Variable:
@@ -52,11 +62,10 @@ class AnalizadorSemantico:
 
         for variable in variables:
             nombre = variable.children[0].children[0]
-            #Encontrar con cuantas dimensiones tiene la variable
+            # Encontrar con cuantas dimensiones tiene la variable
             len_dimensiones = len(variable.children[1:])
             self.declarar_variable(nombre, tipo, len_dimensiones)
             # print(variable.pretty())
-
 
     def declarar_variable(self, nombre, tipo: str, dimensiones: int):
         # checar si ya existe la variable en la lista de directorios
@@ -64,7 +73,8 @@ class AnalizadorSemantico:
             if nombre in directorio:
                 raise SemanticError("ID ya existe")
         # Si no existe declararlo en el último directorio (-1)
-        self.directoriosVariables[-1][str(nombre)] = Variable(tipo, str(nombre), dimensiones)
+        self.directoriosVariables[-1][str(nombre)
+                                      ] = Variable(Tipo(tipo), str(nombre), dimensiones)
 
     def analizar_decfunc(self, subtree: Tree) -> None:
 
@@ -74,13 +84,13 @@ class AnalizadorSemantico:
         if nombre in self.directorioFunciones:
             raise SemanticError("funcion ya existe")
         else:
-            self.directorioFunciones[nombre] = Funcion(tipo, nombre)
+            self.directorioFunciones[nombre] = Funcion(Tipo(tipo), nombre)
         # declarar los argumentos
         # print(subtree.children[2:-2], len(subtree.children[2:-2]))
         for argumento in chunker(subtree.children[2:-2], 2):
             nombre_argumento = argumento[0].children[0]
             tipo_argumento = argumento[1].children[0]
-            self.declarar_variable(nombre_argumento, tipo_argumento, 0)
+            self.declarar_variable(nombre_argumento, Tipo(tipo_argumento), 0)
 
         decvars = subtree.children[-2]
         estatutos = subtree.children[-1].children
@@ -96,11 +106,41 @@ class AnalizadorSemantico:
             self.analizar_estatuto(estatuto)
 
     def analizar_estatuto(self, estatuto: Tree) -> None:
+        # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
+        # El unico que regresa un valor es el returns
         if estatuto.children[0].data == "expresion":
             self.analizar_expresion(estatuto.children[0])
+        elif estatuto.children[0].data == "asignacion":
+            self.analizar_asignacion(estatuto.children[0])
+        elif estatuto.children[0].data == "llamadafuncion":
+            pass
+        elif estatuto.children[0].data == "if":
+            self.analizar_if(estatuto.children[0])
+        elif estatuto.children[0].data == "return":
+            pass
+        elif estatuto.children[0].data == "forloop":
+            pass
+        elif estatuto.children[0].data == "while":
+            pass
+
+    def analizar_asignacion(self, arbol_asignacion: Tree) -> None:
+        # llamadavariable "=" expresion
+        arbol_llamada_variable = arbol_asignacion.children[0]
+        arbol_expresion = arbol_asignacion.children[1]
+
+        tipo_llamada_variable = self.analizar_llamadavariable(
+            arbol_llamada_variable)
+        tipo_expresion = self.analizar_expresion(arbol_expresion)
+
+        # Comparar los tipos
+        if tipo_llamada_variable != tipo_expresion:
+            raise SemanticError("Tipos incompatibles")
+
 
 # regresa booleano si es > o < else el tipo de la exp
-    def analizar_expresion(self, expresion: Tree):
+
+
+    def analizar_expresion(self, expresion: Tree) -> Tipo:
         print(expresion.pretty())
         if len(expresion.children) == 1:
             exp = expresion.children[0]
@@ -113,7 +153,8 @@ class AnalizadorSemantico:
             tipo_exp2 = self.analizar_exp(exp2)
 
             if tipo_exp1 == tipo_exp2:
-                return "bool"
+                return Tipo.Bool
+                # return Tipo("bool")
             else:
                 raise SemanticError("No se pueden comparar")
 
@@ -140,52 +181,49 @@ class AnalizadorSemantico:
         else:
             raise SemanticError("Factor mal formado")
 
-    def analizar_atomo(self, atomo: Tree):
+    def analizar_atomo(self, atomo: Tree) -> Tipo:
         atomo = atomo.children[0]
         if isinstance(atomo, Token):
             print(atomo.type)
             if atomo.type == "CTEI":
-                return "int"
+                return Tipo.Int
             elif atomo.type == "CTEF":
-                return "float"
+                return Tipo.Float
             elif atomo.type == "CTESTR":
-                return "string"
+                return Tipo.String
         else:
             if atomo.data == "llamadavariable":
                # print(atomo.pretty())
-                print(self.directoriosVariables)
-                nombre_variable = str(atomo.children[0].children[0])
-                print(nombre_variable)
-                # Checar que esté declarada
-                variable = None
-                for directorio in self.directoriosVariables:
-                    if nombre_variable in directorio:
-                        variable = directorio[nombre_variable]
-                        break
-                if variable is None:
-                    raise SemanticError("Error, la variable no esta declarada")
-                # Checar que se llame con la cantidad de dimensiones correcta (por ejemplo si es una matriz de dos dimensiones)
-                print(variable)
-                len_dimensiones = len(atomo.children[1:])
-                print(len_dimensiones)
-                if len_dimensiones != variable.dimensiones:
-                    raise SemanticError("Dimensiones incorrectas")
-                else:
-                    #Tengo que confirmar que son del mismo tipo, ejemplo 2+2 = int+int
-                    # Es lo último que se verifica (en la gramática)
-                    return variable.tipo      
+                return self.analizar_llamadavariable(atomo)
+                # que efectivamente si tenga las 2 dimensiones
 
-                #que efectivamente si tenga las 2 dimensiones
-                
             if atomo.data == "llamadafuncion":
-                #Checar que la función esté declarada
-                #Que tiene la cantidad correcta de argumentos
-                #Checar que los argumentos tengan el tipo correcto
+                # Checar que la función esté declarada
+                # Que tiene la cantidad correcta de argumentos
+                # Checar que los argumentos tengan el tipo correcto
                 pass
             if atomo.data == "funcionesespeciales":
-                #Checar que se llame con el tipo correcto
+                # Checar que se llame con el tipo correcto
                 pass
-                
+
+    def analizar_llamadavariable(self, arbol_llamada_variable: Tree):
+        nombre_variable = str(arbol_llamada_variable.children[0].children[0])
+        # Checar que esté declarada
+        variable = None
+        for directorio in self.directoriosVariables:
+            if nombre_variable in directorio:
+                variable = directorio[nombre_variable]
+                break
+        if variable is None:
+            raise SemanticError("Error, la variable no esta declarada")
+        # Checar que se llame con la cantidad de dimensiones correcta (por ejemplo si es una matriz de dos dimensiones)
+        len_dimensiones = len(arbol_llamada_variable.children[1:])
+        if len_dimensiones != variable.dimensiones:
+            raise SemanticError("Dimensiones incorrectas")
+        else:
+            # Tengo que confirmar que son del mismo tipo, ejemplo 2+2 = int+int
+            # Es lo último que se verifica (en la gramática)
+            return variable.tipo
 
     def analizar_operacion_binaria(self, operacion: Tree, funcion):
         lista_operandos = operacion.children[::2]
@@ -197,6 +235,22 @@ class AnalizadorSemantico:
 
         return tipo
 
+    # if : "if" "(" expresion ")" "{" estatutos "}" else
+    def analizar_if(self, arbol_if: Tree):
+        arbol_expresion = arbol_if.children[0]
+        arbol_estatutos = arbol_if.children[1]
+        arbol_else = arbol_if.children[2]
+
+        tipo_arbol_expresion = self.analizar_expresion(arbol_expresion)
+        if tipo_arbol_expresion != Tipo.Bool:
+            raise SemanticError("Tipo no booleano")
+
+        self.analizar_estatutos(arbol_estatutos)
+        self.analizar_else(arbol_else)
+
+    def analizar_else(self, arbol_else: Tree) -> None:
+        pass
+
 
 def get_token(subtree: Tree, token_type: str):
     return [token.value for token in filter(lambda t: t.type == token_type,
@@ -206,4 +260,4 @@ def get_token(subtree: Tree, token_type: str):
 
 
 def chunker(seq, size):
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos: pos + size] for pos in range(0, len(seq), size))
