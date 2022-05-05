@@ -124,12 +124,16 @@ class GeneracionCuadruplos:
         return valor_termino_izq
 
     # Lega el arbol de la regla de asignacion
+    #Cuadruplo de asignacion: = valor_expresion _ variable
     def generar_cuadruplos_asignacion(self, asignacion: Tree):
         # asignacion : llamadavariable "=" expresion
         llamada_var_asig = asignacion.children[0]
+        arbol_expresion = asignacion.children[1]
+        valor_expresion = self.generar_cuadruplos_expresion(arbol_expresion)
+        #Generar llamada variable
 
-        print(llamada_var_asig)
-        pass
+ 
+        
 
     def generar_cuadruplos_decvars(self, decvars: Tree):
 
