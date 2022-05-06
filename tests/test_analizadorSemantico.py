@@ -104,5 +104,71 @@ def test_variable_dimensiones_incorrectas():
     with pytest.raises(SemanticError):
         analizador.analizarArbol()
 
+def test_if():
 
-# Pruebas de
+    programa = """main(){
+        if(a>b){
+            3+2;
+        };
+    } """
+
+    analizador = AnalizadorSemantico(programa)
+
+    analizador.analizarArbol()
+
+def test_while():
+    programa = """main(){
+        while(a<b){
+            3+2;
+        };
+    }"""
+    analizador = AnalizadorSemantico(programa)
+
+    analizador.analizarArbol()
+
+def test_else():
+    programa = """main(){
+        if(a>b){
+            2+3+4;
+        }else{
+            2+2;
+        };
+    }"""
+    analizador = AnalizadorSemantico(programa)
+
+    analizador.analizarArbol()
+
+def test_return():
+    programa = """main(){
+        if(a>b){
+            2+3+4;
+        }else{
+            2+2;
+        };
+        return 5.3*3.2;
+    }"""
+    analizador = AnalizadorSemantico(programa)
+
+    analizador.analizarArbol()
+
+def test_for():
+    programa = """main(){
+        var int: i;
+        for  i = 0 to  10{
+            2+4;
+        };
+    }"""
+    analizador = AnalizadorSemantico(programa)
+
+    analizador.analizarArbol()
+
+def test_for_error():
+    programa = """main(){
+        for  i = 0 to  10{
+            2+4;
+        };
+    }"""
+    analizador = AnalizadorSemantico(programa)
+    with pytest.raises(SemanticError):
+        analizador.analizarArbol()
+        print(analizador.directoriosVariables)

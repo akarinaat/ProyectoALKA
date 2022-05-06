@@ -74,7 +74,7 @@ ALKA_parser = Lark(
 
     asignacion : llamadavariable "=" expresion
 
-    forloop : "for" id "=" expresion "to" expresion "{" estatutos "}"
+    forloop : "for" asignacion "to" expresion "{" estatutos "}"
 
     while : "while" "(" expresion ")" "{" estatutos "}"
 
