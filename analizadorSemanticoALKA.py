@@ -1,4 +1,5 @@
 from cmath import nan
+from ssl import ALERT_DESCRIPTION_CERTIFICATE_UNOBTAINABLE
 from typing import List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
@@ -117,10 +118,12 @@ class AnalizadorSemantico:
         elif estatuto.children[0].data == "if":
             self.analizar_if(estatuto.children[0])
         elif estatuto.children[0].data == "return":
-            pass
+            self.analizar_return(estatuto.children[0])
+            
         elif estatuto.children[0].data == "forloop":
             pass
         elif estatuto.children[0].data == "while":
+            self.analizar_while(estatuto.children[0])
             pass
 
     def analizar_asignacion(self, arbol_asignacion: Tree) -> None:
@@ -249,7 +252,24 @@ class AnalizadorSemantico:
         self.analizar_else(arbol_else)
 
     def analizar_else(self, arbol_else: Tree) -> None:
-        pass
+        if len(arbol_else.children) != 0:
+           self.analizar_estatutos(arbol_else.children[0]) 
+        
+    def analizar_return(self, arbol_return:Tree)->Tipo:
+        expresion = arbol_return.children[0]
+        #Regresa un tipo
+        return self.analizar_expresion(expresion) 
+
+    # while : "while" "(" expresion ")" "{" estatutos "}"
+    def analizar_while(self, arbol_while:Tree):
+        arbol_expresion_while = arbol_while.children[0]
+        arbol_estatutos_while = arbol_while.children[1]
+
+        tipo_expresion_while = self.analizar_expresion(arbol_expresion_while)
+        self.analizar_estatutos(arbol_estatutos_while)
+
+        if tipo_expresion_while != Tipo.Bool:
+            raise SemanticError("Tipo no booleano")
 
 
 def get_token(subtree: Tree, token_type: str):
