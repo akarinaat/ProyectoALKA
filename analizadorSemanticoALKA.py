@@ -1,6 +1,4 @@
-from cmath import nan
-from ssl import ALERT_DESCRIPTION_CERTIFICATE_UNOBTAINABLE
-from typing import List
+from typing import Dict, List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
 from dataclasses import dataclass
@@ -21,7 +19,7 @@ class Tipo(Enum):
 @dataclass  # son para guardar información
 class Variable:
 
-    tipo: str
+    tipo: Tipo
     nombre: str
     dimensiones: int
 
@@ -29,7 +27,7 @@ class Variable:
 @dataclass
 class Funcion:
 
-    tipo: str
+    tipo: Tipo
     nombre: str
 
 
@@ -37,8 +35,15 @@ class AnalizadorSemantico:
 
     def __init__(self, input) -> None:
         # Directorio de variables, en lista para poder analizar las globales y las locales
-        self.directoriosVariables = [{}]
-        self.directorioFunciones = {}  # Directorio de funciones
+        #List[Dict[str,Variable]] = [{}]
+        # Dict[str,Funcion] 
+        # Se declaran así osd directorios para saber de qué tipo es la info que contiene
+        #Si no lo pongo, habrá un error de :
+        #error: Need type annotation for "directoriosVariables"
+        # error: Need type annotation for "directorioFunciones"
+
+        self.directoriosVariables: List[Dict[str,Variable]] = [{}]
+        self.directorioFunciones : Dict[str,Funcion] = {}  # Directorio de funciones
         self.arbol: Tree = ALKA_parser.parse(input)
 
     def analizarArbol(self):
@@ -53,13 +58,11 @@ class AnalizadorSemantico:
 
     def analizar_main(self, arbol_main:Tree):
         # main : "main" "(" ")" "{" decvars estatutos "}"
-        decvars_main = arbol_main.children[0]
-        estatutos_main = arbol_main.children[1]
+        arbol_decvars_main = arbol_main.children[0]
+        arbol_estatutos_main = arbol_main.children[1]
         
-        self.analizar_decvars(decvars_main)
-        self.analizar_estatutos(estatutos_main)
-
-        
+        self.analizar_decvars(arbol_decvars_main)
+        self.analizar_estatutos(arbol_estatutos_main.children)
 
     def analizar_decvars(self, subtree: Tree) -> None:
         for decvar in subtree.children:
@@ -77,27 +80,27 @@ class AnalizadorSemantico:
             nombre = variable.children[0].children[0]
             # Encontrar con cuantas dimensiones tiene la variable
             len_dimensiones = len(variable.children[1:])
-            self.declarar_variable(nombre, tipo, len_dimensiones)
+            self.declarar_variable(nombre, Tipo(tipo), len_dimensiones)
             # print(variable.pretty())
 
-    def declarar_variable(self, nombre, tipo: str, dimensiones: int):
+    def declarar_variable(self, nombre, tipo: Tipo, dimensiones: int):
         # checar si ya existe la variable en la lista de directorios
         for directorio in self.directoriosVariables:
             if nombre in directorio:
                 raise SemanticError("ID ya existe")
         # Si no existe declararlo en el último directorio (-1)
         self.directoriosVariables[-1][str(nombre)
-                                      ] = Variable(Tipo(tipo), str(nombre), dimensiones)
+                                      ] = Variable(tipo, str(nombre), dimensiones)
 
     def analizar_decfunc(self, subtree: Tree) -> None:
 
         self.directoriosVariables.append({})
-        tipo = subtree.children[0].children[0]
-        nombre = subtree.children[1].children[0]
+        tipo = Tipo(subtree.children[0].children[0])
+        nombre = str(subtree.children[1].children[0])
         if nombre in self.directorioFunciones:
             raise SemanticError("funcion ya existe")
         else:
-            self.directorioFunciones[nombre] = Funcion(Tipo(tipo), nombre)
+            self.directorioFunciones[nombre] = Funcion(tipo, nombre)
         # declarar los argumentos
         # print(subtree.children[2:-2], len(subtree.children[2:-2]))
         for argumento in chunker(subtree.children[2:-2], 2):
@@ -212,12 +215,12 @@ class AnalizadorSemantico:
                 return self.analizar_llamadavariable(atomo)
                 # que efectivamente si tenga las 2 dimensiones
 
-            if atomo.data == "llamadafuncion":
+            elif atomo.data == "llamadafuncion":
                 # Checar que la función esté declarada
                 # Que tiene la cantidad correcta de argumentos
                 # Checar que los argumentos tengan el tipo correcto
                 pass
-            if atomo.data == "funcionesespeciales":
+            elif atomo.data == "funcionesespeciales":
                 # Checar que se llame con el tipo correcto
                 pass
 
@@ -261,12 +264,12 @@ class AnalizadorSemantico:
         if tipo_arbol_expresion != Tipo.Bool:
             raise SemanticError("Tipo no booleano")
 
-        self.analizar_estatutos(arbol_estatutos)
+        self.analizar_estatutos(arbol_estatutos.children)
         self.analizar_else(arbol_else)
 
     def analizar_else(self, arbol_else: Tree) -> None:
         if len(arbol_else.children) != 0:
-            self.analizar_estatutos(arbol_else.children[0])
+            self.analizar_estatutos(arbol_else.children[0].children)
 
     def analizar_return(self, arbol_return: Tree) -> Tipo:
         expresion = arbol_return.children[0]
@@ -279,7 +282,7 @@ class AnalizadorSemantico:
         arbol_estatutos_while = arbol_while.children[1]
 
         tipo_expresion_while = self.analizar_expresion(arbol_expresion_while)
-        self.analizar_estatutos(arbol_estatutos_while)
+        self.analizar_estatutos(arbol_estatutos_while.children)
 
         if tipo_expresion_while != Tipo.Bool:
             raise SemanticError("Tipo no booleano")

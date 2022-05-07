@@ -107,6 +107,7 @@ def test_variable_dimensiones_incorrectas():
 def test_if():
 
     programa = """main(){
+        var int: a,b;
         if(a>b){
             3+2;
         };
@@ -118,6 +119,7 @@ def test_if():
 
 def test_while():
     programa = """main(){
+        var int: a,b;
         while(a<b){
             3+2;
         };
@@ -128,6 +130,7 @@ def test_while():
 
 def test_else():
     programa = """main(){
+        var int: a,b;
         if(a>b){
             2+3+4;
         }else{
@@ -140,6 +143,7 @@ def test_else():
 
 def test_return():
     programa = """main(){
+        var int: a,b;
         if(a>b){
             2+3+4;
         }else{

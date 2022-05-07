@@ -32,9 +32,34 @@ def test_prueba_decvar():
 def test_expresion_llamada_var():
     programa = """main(){
         var float: b;
-        b+3;
+        b+3.2;
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) == 2
     assert generador.listaCuadruplos[1].op1 == "b"
+
+
+
+def test_if():
+    programa = """main(){
+        var int: a,b;
+        if(a>b){
+            3+2;
+        };
+    } """
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos()
+    assert len(generador.listaCuadruplos) == 6
+
+def test_while():
+    programa = """main(){
+        var int: a;
+        while(a>5){
+            2+1;
+        };
+    } """
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos()
+    assert len(generador.listaCuadruplos) == 5
+    

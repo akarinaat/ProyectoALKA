@@ -67,7 +67,7 @@ class GeneracionCuadruplos:
                 self.generar_cuadruplos_estatutos(child)
                 pass
 
-    def generar_cuadruplos_estatutos(self, estatutos):
+    def generar_cuadruplos_estatutos(self, estatutos:Tree):
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
 
         for estatuto in estatutos.children:
@@ -231,3 +231,26 @@ class GeneracionCuadruplos:
             # generar los cuádruplos de las expresiones de las dimensiones
             self.generar_cuadruplo_nuevo(
                 "decvar", tipo, dimensiones_str, str(nombre))
+
+    # while : "while" "(" expresion ")" "{" estatutos "}"
+    def generar_cuadruplos_while(self, arbol_while:Tree):
+        arbol_expresion_while = arbol_while.children[0]
+        arbol_estatutos_while = arbol_while.children[1] #Aqui ya no le pongo el .children porque generar 
+                                                        #generar_cuadruplos_estatutos ya recibe el arbol y
+                                                        #en el for, ya loopeo en el .children
+        posicion_dela_condicion = len(self.listaCuadruplos)
+        resultado_expresion = self.generar_cuadruplos_expresion(arbol_expresion_while)
+        #goto
+        self.generar_cuadruplo_nuevo("gotof", resultado_expresion, "", "")
+        posicion_goto = len(self.listaCuadruplos) - 1
+        self.generar_cuadruplos_estatutos(arbol_estatutos_while)
+        self.generar_cuadruplo_nuevo("goto","","",posicion_dela_condicion)
+        posicion_acabando_while = len(self.listaCuadruplos)
+        self.listaCuadruplos[posicion_goto].temporal = posicion_acabando_while
+
+
+
+        
+
+    def generar_cuadruplos_if(self):
+        pass
