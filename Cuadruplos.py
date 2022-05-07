@@ -247,7 +247,7 @@ class GeneracionCuadruplos:
         self.generar_cuadruplo_nuevo("goto","","",posicion_dela_condicion)
         posicion_acabando_while = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_goto].temporal = posicion_acabando_while
-
+            
 
 
         
