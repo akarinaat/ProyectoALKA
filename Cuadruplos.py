@@ -149,7 +149,7 @@ class GeneracionCuadruplos:
             valor_factor_izq = self.generar_cuadruplo_nuevo(
                 operacion, valor_factor_izq, valor_factor_der)
         return valor_factor_izq
-
+    
     # factor "(" expresion ")" | (PLUS | MINUS)? atomo
     def generar_cuadruplos_factor(self, arbol_factor: Tree):
         if len(arbol_factor.children) == 1:

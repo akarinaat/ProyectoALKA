@@ -40,9 +40,11 @@ class AnalizadorSemantico:
         #error: Need type annotation for "directoriosVariables"
         # error: Need type annotation for "directorioFunciones"
 
-        self.directoriosVariables: List[Dict[str,Variable]] = [{}]
+        self.directoriosVariables: List[Dict[str,Variable]] = [{}] # Lista de directorio de variables
+                                                                   # Se usa una lista por lo de las variables 
+                                                                   # locales de cada función (esas serían el dir2) 
         self.directorioFunciones : Dict[str,Funcion] = {}  # Directorio de funciones
-        self.arbol: Tree = ALKA_parser.parse(input)
+        self.arbol: Tree = ALKA_parser.parse(input) # Se define el árbol
 
     def analizarArbol(self):
         for subtree in self.arbol.children:
@@ -79,7 +81,6 @@ class AnalizadorSemantico:
             # Encontrar con cuantas dimensiones tiene la variable
             len_dimensiones = len(variable.children[1:])
             self.declarar_variable(nombre, Tipo(tipo), len_dimensiones)
-            # print(variable.pretty())
 
     def declarar_variable(self, nombre, tipo: Tipo, dimensiones: int):
         # checar si ya existe la variable en la lista de directorios
@@ -114,6 +115,11 @@ class AnalizadorSemantico:
 
         # analizar el cuerpo de la función
         self.analizar_estatutos(estatutos)
+
+######################### ANALIZAR ESTATUTOS #######################
+#### A cada función de analizar le llega el arbol que le corresponde
+###  Se asigna una a variable al valor de los nodos
+#    Se analizan los valores 
 
     def analizar_estatutos(self, estatutos: List[Tree]) -> None:
         for estatuto in estatutos:
