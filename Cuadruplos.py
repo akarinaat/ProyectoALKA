@@ -67,7 +67,7 @@ class GeneracionCuadruplos:
                 self.generar_cuadruplos_estatutos(child)
                 pass
 
-    def generar_cuadruplos_estatutos(self, estatutos:Tree):
+    def generar_cuadruplos_estatutos(self, estatutos: Tree):
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
 
         for estatuto in estatutos.children:
@@ -233,65 +233,71 @@ class GeneracionCuadruplos:
                 "decvar", tipo, dimensiones_str, str(nombre))
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
-    def generar_cuadruplos_while(self, arbol_while:Tree):
+    def generar_cuadruplos_while(self, arbol_while: Tree):
         arbol_expresion_while = arbol_while.children[0]
-        arbol_estatutos_while = arbol_while.children[1] #Aqui ya no le pongo el .children porque generar 
-                                                        #generar_cuadruplos_estatutos ya recibe el arbol y
-                                                        #en el for, ya loopeo en el .children
+        # Aqui ya no le pongo el .children porque generar
+        arbol_estatutos_while = arbol_while.children[1]
+        # generar_cuadruplos_estatutos ya recibe el arbol y
+        # en el for, ya loopeo en el .children
         posicion_dela_condicion = len(self.listaCuadruplos)
-        resultado_expresion = self.generar_cuadruplos_expresion(arbol_expresion_while)
-        #goto
+        resultado_expresion = self.generar_cuadruplos_expresion(
+            arbol_expresion_while)
+        # goto
         self.generar_cuadruplo_nuevo("gotof", resultado_expresion, "", "")
         posicion_goto = len(self.listaCuadruplos) - 1
         self.generar_cuadruplos_estatutos(arbol_estatutos_while)
-        self.generar_cuadruplo_nuevo("goto","","",posicion_dela_condicion)
+        self.generar_cuadruplo_nuevo("goto", "", "", posicion_dela_condicion)
         posicion_acabando_while = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_goto].temporal = posicion_acabando_while
 
     # if : "if" "(" expresion ")" "{" estatutos "}" else
     def generar_cuadruplos_if(self, arbol_if: Tree):
-          #Cuadruplos
-          #1. Declara variable a
-          #2. Declara variable b
-          #3. > a b t0
-          #4. gotof t0  _
-          #5. + 3 2 t1
-          #6. goto 7 _
+        # Cuadruplos
+        # 1. Declara variable a
+        # 2. Declara variable b
+        # 3. > a b t0
+        # 4. gotof t0  _
+        # 5. + 3 2 t1
+        # 6. goto 7 _
 
         arbol_expresion_if = arbol_if.children[0]
         arbol_estatutos_if = arbol_if.children[1]
         arbol_else_if = arbol_if.children[2]
 
-        #1. Generar cuadruplos de la condicion
-        resultado_expresion_if = self.generar_cuadruplos_expresion(arbol_expresion_if)
+        # 1. Generar cuadruplos de la condicion
+        resultado_expresion_if = self.generar_cuadruplos_expresion(
+            arbol_expresion_if)
 
-        #2. gotof de la condición (4)
-        self.generar_cuadruplo_nuevo("gotof",resultado_expresion_if, "", "")
-        #La posicion es el ultimo elmento de la lista de cuadruplos
-        posicion_gotof = len(self.listaCuadruplos) - 1 
+        # 2. gotof de la condición (4)
+        self.generar_cuadruplo_nuevo("gotof", resultado_expresion_if, "", "")
+        # La posicion es el ultimo elmento de la lista de cuadruplos
+        posicion_gotof = len(self.listaCuadruplos) - 1
 
-        #3. Generamos los cuadruplos del cuerpo del if
+        # 3. Generamos los cuadruplos del cuerpo del if
         self.generar_cuadruplos_estatutos(arbol_estatutos_if)
 
-        #4. GOTO para saltar el else
-        self.generar_cuadruplo_nuevo("goto","","","")
-        posicion_goto_saltar_else = len(self.listaCuadruplos) - 1 
+        # 4. GOTO para saltar el else
+        self.generar_cuadruplo_nuevo("goto", "", "", "")
+        posicion_goto_saltar_else = len(self.listaCuadruplos) - 1
 
-        #La posición justo después del if
+        # La posición justo después del if
         posicion_terminando_if = len(self.listaCuadruplos)
 
-        #5. Ponerle al gotof la posicion después del if
-        #Al gotof le tengo que poner la posición de a donde brincar despues del cuerpo del if
+        # 5. Ponerle al gotof la posicion después del if
+        # Al gotof le tengo que poner la posición de a donde brincar despues del cuerpo del if
         self.listaCuadruplos[posicion_gotof].temporal = posicion_terminando_if
-       
-        #6. Generar cuadruplos del else
+
+        # 6. Generar cuadruplos del else
         self.generar_cuadruplos_else(arbol_else_if)
 
+        posicion_despues_else = len(self.listaCuadruplos)
 
-      #else : ("else" "{" estatutos "}")?  
-    def generar_cuadruplos_else(self, arbol_else:Tree):
+        # 7. Ponerle la posicion al goto de saltar else
+
+        self.listaCuadruplos[posicion_goto_saltar_else].temporal = posicion_despues_else
+
+      # else : ("else" "{" estatutos "}")?
+
+    def generar_cuadruplos_else(self, arbol_else: Tree):
         if len(arbol_else.children) > 0:
             self.generar_cuadruplos_estatutos(arbol_else.children[0])
-        
-
-        
