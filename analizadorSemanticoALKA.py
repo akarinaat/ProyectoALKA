@@ -4,10 +4,8 @@ from lark import Token, Tree, tree
 from dataclasses import dataclass
 from enum import Enum
 
-
 class SemanticError(Exception):
     pass
-
 
 class Tipo(Enum):
     Float = "float"
@@ -141,7 +139,7 @@ class AnalizadorSemantico:
 
         elif estatuto.children[0].data == "forloop":
             self.analizar_for(estatuto.children[0])
-            
+
         elif estatuto.children[0].data == "while":
             self.analizar_while(estatuto.children[0])
 
