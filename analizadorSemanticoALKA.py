@@ -123,21 +123,25 @@ class AnalizadorSemantico:
 
     def analizar_estatuto(self, estatuto: Tree) -> None:
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
-        # El unico que regresa un valor es el returns
+        # El unico que regresa un valor es el return
         print("estatuto")
         if estatuto.children[0].data == "expresion":
             self.analizar_expresion(estatuto.children[0])
+
         elif estatuto.children[0].data == "asignacion":
             self.analizar_asignacion(estatuto.children[0])
+
         elif estatuto.children[0].data == "llamadafuncion":
             pass
         elif estatuto.children[0].data == "if":
             self.analizar_if(estatuto.children[0])
+
         elif estatuto.children[0].data == "return":
             self.analizar_return(estatuto.children[0])
+
         elif estatuto.children[0].data == "forloop":
-            print("estatuto")
             self.analizar_for(estatuto.children[0])
+            
         elif estatuto.children[0].data == "while":
             self.analizar_while(estatuto.children[0])
 

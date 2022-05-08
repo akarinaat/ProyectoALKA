@@ -247,10 +247,51 @@ class GeneracionCuadruplos:
         self.generar_cuadruplo_nuevo("goto","","",posicion_dela_condicion)
         posicion_acabando_while = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_goto].temporal = posicion_acabando_while
-            
+
+    # if : "if" "(" expresion ")" "{" estatutos "}" else
+    def generar_cuadruplos_if(self, arbol_if: Tree):
+          #Cuadruplos
+          #1. Declara variable a
+          #2. Declara variable b
+          #3. > a b t0
+          #4. gotof t0  _
+          #5. + 3 2 t1
+          #6. goto 7 _
+
+        arbol_expresion_if = arbol_if.children[0]
+        arbol_estatutos_if = arbol_if.children[1]
+        arbol_else_if = arbol_if.children[2]
+
+        #1. Generar cuadruplos de la condicion
+        resultado_expresion_if = self.generar_cuadruplos_expresion(arbol_expresion_if)
+
+        #2. gotof de la condición (4)
+        self.generar_cuadruplo_nuevo("gotof",resultado_expresion_if, "", "")
+        #La posicion es el ultimo elmento de la lista de cuadruplos
+        posicion_gotof = len(self.listaCuadruplos) - 1 
+
+        #3. Generamos los cuadruplos del cuerpo del if
+        self.generar_cuadruplos_estatutos(arbol_estatutos_if)
+
+        #4. GOTO para saltar el else
+        self.generar_cuadruplo_nuevo("goto","","","")
+        posicion_goto_saltar_else = len(self.listaCuadruplos) - 1 
+
+        #La posición justo después del if
+        posicion_terminando_if = len(self.listaCuadruplos)
+
+        #5. Ponerle al gotof la posicion después del if
+        #Al gotof le tengo que poner la posición de a donde brincar despues del cuerpo del if
+        self.listaCuadruplos[posicion_gotof].temporal = posicion_terminando_if
+       
+        #6. Generar cuadruplos del else
+        self.generar_cuadruplos_else(arbol_else_if)
 
 
+      #else : ("else" "{" estatutos "}")?  
+    def generar_cuadruplos_else(self, arbol_else:Tree):
+        if len(arbol_else.children) > 0:
+            self.generar_cuadruplos_estatutos(arbol_else.children[0])
         
 
-    def generar_cuadruplos_if(self):
-        pass
+        

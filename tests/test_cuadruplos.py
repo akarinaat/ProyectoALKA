@@ -42,6 +42,16 @@ def test_expresion_llamada_var():
 
 
 def test_if():
+    #Cuadruplos
+    #1. Declara variable a
+    #2. Declara variable b
+    #3. > a b t0
+    #4. gotof t0  _
+    #5. + 3 2 t1
+    #6. goto 7 _
+    
+    
+
     programa = """main(){
         var int: a,b;
         if(a>b){
