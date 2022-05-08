@@ -40,7 +40,6 @@ def test_expresion_llamada_var():
     assert generador.listaCuadruplos[1].op1 == "b"
 
 
-
 def test_if():
     #Cuadruplos
     #1. Declara variable a
@@ -73,3 +72,31 @@ def test_while():
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) == 5
     
+def test_for():
+    programa = """main(){
+        var int: a;
+        for a = 0 to 10 {
+
+            4+5;
+        };
+    }"""
+    #Convertir como a while
+    ### var int a
+    # a= 0;
+    # while (a < 10){
+    #   Cuerpo While
+    #   a = a +1;
+    # }
+
+    # cuadruplos esperados: 
+    # dec a
+    # = 0   a
+    # < a 10 t0   -> generar condicion y guardar su lugar
+    # gotof t0 _ -> generar gotof
+    # + 4 5 t1
+    # + a 1 t2  -> incermentar la variable de control
+    # = t2  a
+    # goto condicion -> hacer goto a la posicion de la condicion
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos()
+    assert len(generador.listaCuadruplos) == 8

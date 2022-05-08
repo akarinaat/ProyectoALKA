@@ -48,7 +48,7 @@ class AnalizadorSemantico:
 
     def analizarArbol(self):
         for subtree in self.arbol.children:
-            print(subtree.pretty())
+           
             if subtree.data == "decvars":
                 self.analizar_decvars(subtree)
             elif subtree.data == "decfuncs":
@@ -128,7 +128,7 @@ class AnalizadorSemantico:
     def analizar_estatuto(self, estatuto: Tree) -> None:
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
         # El unico que regresa un valor es el return
-        print("estatuto")
+       
         if estatuto.children[0].data == "expresion":
             self.analizar_expresion(estatuto.children[0])
 
@@ -151,7 +151,7 @@ class AnalizadorSemantico:
 
     def analizar_asignacion(self, arbol_asignacion: Tree) -> Tipo:
         # llamadavariable "=" expresion
-        print("ASIGN")
+       
         arbol_llamada_variable = arbol_asignacion.children[0]
         arbol_expresion = arbol_asignacion.children[1]
 
@@ -167,7 +167,7 @@ class AnalizadorSemantico:
 # regresa booleano si es > o < else el tipo de la exp
 
     def analizar_expresion(self, expresion: Tree) -> Tipo:
-        print(expresion.pretty())
+       
         if len(expresion.children) == 1:
             exp = expresion.children[0]
             return self.analizar_exp(exp)
@@ -210,7 +210,7 @@ class AnalizadorSemantico:
     def analizar_atomo(self, atomo: Tree) -> Tipo:
         atomo = atomo.children[0]
         if isinstance(atomo, Token):
-            print(atomo.type)
+          
             if atomo.type == "CTEI":
                 return Tipo.Int
             elif atomo.type == "CTEF":
@@ -240,7 +240,7 @@ class AnalizadorSemantico:
             if nombre_variable in directorio:
                 variable = directorio[nombre_variable]
                 break
-        print(variable)
+       
         if variable is None:
             raise SemanticError("Error, la variable no esta declarada")
         # Checar que se llame con la cantidad de dimensiones correcta (por ejemplo si es una matriz de dos dimensiones)
@@ -300,10 +300,17 @@ class AnalizadorSemantico:
         arbol_asignacion_for = arbol_forloop.children[0]
         arbbol_expresion_for = arbol_forloop.children[1]
         arbol_estaturos_for = arbol_forloop.children[2]
-        print("FOR")
+       
         tipo_asig_for = self.analizar_asignacion(arbol_asignacion_for)
         if tipo_asig_for != Tipo.Int:
             raise SemanticError("Variable tiene que ser entero")
+
+        
+        tipo_expresion_for = self.analizar_expresion(arbbol_expresion_for)
+        if tipo_expresion_for != Tipo.Int:
+            raise SemanticError("Variable tiene que ser entero")
+
+        self.analizar_estatutos(arbol_estaturos_for.children)
 
 
 def get_token(subtree: Tree, token_type: str):

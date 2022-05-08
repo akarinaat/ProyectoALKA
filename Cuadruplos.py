@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 from analizadorSemanticoALKA import AnalizadorSemantico
 from lark import Token, Tree
 
@@ -45,7 +45,7 @@ class GeneracionCuadruplos:
             return direccion
 
     def generar_cuadruplos(self):
-        print(self.arbol.pretty())
+      
         for subtree in self.arbol.children:
             if subtree.data == "decvars":
                 pass
@@ -88,7 +88,7 @@ class GeneracionCuadruplos:
                 self.generar_cuadruplos_while(estatuto.children[0])
 
             elif estatuto.children[0].data == "forloop":
-                self.generar_cuadruplos_forloop(estatuto.children[0])
+                self.generar_cuadruplos_for(estatuto.children[0])
 
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
@@ -149,7 +149,7 @@ class GeneracionCuadruplos:
             valor_factor_izq = self.generar_cuadruplo_nuevo(
                 operacion, valor_factor_izq, valor_factor_der)
         return valor_factor_izq
-    
+
     # factor "(" expresion ")" | (PLUS | MINUS)? atomo
     def generar_cuadruplos_factor(self, arbol_factor: Tree):
         if len(arbol_factor.children) == 1:
@@ -177,7 +177,7 @@ class GeneracionCuadruplos:
             elif atomo.type == "CTESTR":
                 return atomo
         else:  # Es un arbol, no token.
-            print("atomo child:", atomo.pretty())
+            # print("atomo child:", atomo.pretty())
 
             if atomo.data == 'llamadavariable':
                 return atomo.children[0].children[0]
@@ -194,18 +194,22 @@ class GeneracionCuadruplos:
 ################## ASIGNACION ##########################
     # Lega el arbol de la regla de asignacion
     # Cuadruplo de asignacion: = valor_expresion _ variable
-    def generar_cuadruplos_asignacion(self, asignacion: Tree):
+    def generar_cuadruplos_asignacion(self, asignacion: Tree) -> Any:
         # asignacion : llamadavariable "=" expresion
         llamada_var_asig = asignacion.children[0]
         arbol_expresion = asignacion.children[1]
         valor_expresion = self.generar_cuadruplos_expresion(arbol_expresion)
         # Generar llamada variable
+        variable = self.generar_cuadruplos_llamadavariable(llamada_var_asig)
+        self.generar_cuadruplo_nuevo("=", valor_expresion, "", variable)
+        return variable
 
 ############### LLAMADAVARIABLE #######################
    # llamadavariable : id ("[" expresion "]" )*
     def generar_cuadruplos_llamadavariable(self, llamadavariable: Tree):
-        id_var = llamadavariable.children[0]
+        id_var = llamadavariable.children[0].children[0]
         print(id_var, "el nombre de llamada variable")
+        return id_var
 
     def generar_cuadruplos_decvars(self, decvars: Tree):
 
@@ -301,3 +305,46 @@ class GeneracionCuadruplos:
     def generar_cuadruplos_else(self, arbol_else: Tree):
         if len(arbol_else.children) > 0:
             self.generar_cuadruplos_estatutos(arbol_else.children[0])
+
+    # forloop : "for" asignacion "to" expresion "{" estatutos "}"
+    def generar_cuadruplos_for(self, arbol_for: Tree):
+        # cuadruplos esperados:
+        # dec a
+        # = 0   a
+        # < a 10 t0   -> generar condicion y guardar su lugar
+        # gotof t0 _ -> generar gotof
+        # + 4 5 t1
+        # + a 1 t2  -> incermentar la variable de control
+        # = t2  a
+        # goto condicion -> hacer goto a la posicion de la condicion
+
+        arbol_asignacion_for = arbol_for.children[0]
+        arbol_expresion_for = arbol_for.children[1]
+        arbol_estatutos_for = arbol_for.children[2]
+
+        self.generar_cuadruplos_asignacion(arbol_asignacion_for)
+        variable = arbol_asignacion_for.children[0]
+        resultado_expresion = self.generar_cuadruplos_expresion(arbol_expresion_for)
+
+        # # < a 10 t0   -> generar condicion y guardar su lugar
+        resultado_condicion = self.generar_cuadruplo_nuevo("<", variable, resultado_expresion)
+        posicion_condicion = len(self.listaCuadruplos) -1
+
+        # gotof t0 _ -> generar gotof y guardar su lugar
+        self.generar_cuadruplo_nuevo("gotof",resultado_condicion,"","")
+        posicion_gotof = len(self.listaCuadruplos) -1
+
+        #generar el cuerpo del for
+        self.generar_cuadruplos_estatutos(arbol_estatutos_for)
+
+        #Incrementar la variable de control
+        resultado_incremento = self.generar_cuadruplo_nuevo("+",variable,"1")
+        self.generar_cuadruplo_nuevo("=",resultado_incremento,"",variable)
+
+        #goto de regreso al a condicion
+        self.generar_cuadruplo_nuevo("goto","","",posicion_condicion)
+
+        #ponerle la direccion despues del for al gotof
+        posicion_despues_for = len(self.listaCuadruplos)
+        self.listaCuadruplos[posicion_gotof].temporal = posicion_despues_for
+
