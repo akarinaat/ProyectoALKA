@@ -176,3 +176,30 @@ def test_for_error():
     with pytest.raises(SemanticError):
         analizador.analizarArbol()
         print(analizador.directoriosVariables)
+
+
+def test_llamadafuncion_error():
+    programa = """
+    
+    main(){
+    foo();    
+    }"""
+    analizador = AnalizadorSemantico(programa)
+    with pytest.raises(SemanticError):
+        analizador.analizarArbol()
+        print(analizador.directoriosVariables)
+
+
+def test_llamadafuncion():
+    programa = """
+    func int foo (a int){
+        a + 8;
+        return 3;
+    }
+    main(){
+    foo(3);    
+    }"""
+    analizador = AnalizadorSemantico(programa)
+    analizador.analizarArbol()
+    print(analizador.directoriosVariables)
+
