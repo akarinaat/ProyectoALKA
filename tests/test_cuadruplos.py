@@ -41,15 +41,13 @@ def test_expresion_llamada_var():
 
 
 def test_if():
-    #Cuadruplos
-    #1. Declara variable a
-    #2. Declara variable b
-    #3. > a b t0
-    #4. gotof t0  _
-    #5. + 3 2 t1
-    #6. goto 7 _
-    
-    
+    # Cuadruplos
+    # 1. Declara variable a
+    # 2. Declara variable b
+    # 3. > a b t0
+    # 4. gotof t0  _
+    # 5. + 3 2 t1
+    # 6. goto 7 _
 
     programa = """main(){
         var int: a,b;
@@ -61,6 +59,7 @@ def test_if():
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) == 6
 
+
 def test_while():
     programa = """main(){
         var int: a;
@@ -71,7 +70,8 @@ def test_while():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) == 5
-    
+
+
 def test_for():
     programa = """main(){
         var int: a;
@@ -80,15 +80,15 @@ def test_for():
             4+5;
         };
     }"""
-    #Convertir como a while
-    ### var int a
+    # Convertir como a while
+    # var int a
     # a= 0;
     # while (a < 10){
     #   Cuerpo While
     #   a = a +1;
     # }
 
-    # cuadruplos esperados: 
+    # cuadruplos esperados:
     # dec a
     # = 0   a
     # < a 10 t0   -> generar condicion y guardar su lugar
@@ -100,3 +100,16 @@ def test_for():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) == 8
+
+
+def test_llamadafuncion():
+    programa = """ 
+    func int foo(a int, b int){
+        a+b;
+    }
+    main(){
+        foo(2*3,5+4);
+    }"""
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos()
+    assert len(generador.listaCuadruplos) > 8

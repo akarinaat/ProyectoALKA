@@ -12,6 +12,13 @@ class Cuadruplo:
     op2: str
     temporal: str
 
+@dataclass
+class Funcion:
+
+    tamaño: int
+    nombre: str
+    direccion_inicio: int
+
 
 class GeneracionCuadruplos:
 
