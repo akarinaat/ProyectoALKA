@@ -31,7 +31,7 @@ class GeneracionCuadruplos:
         self.temporal_actual += 1
         return temporal_actual
 
-    def generar_cuadruplo_nuevo(self, operacion, operando_izq, operando_der, direccion=None):
+    def generar_cuadruplo_nuevo(self, operacion: str, operando_izq: str, operando_der: str, direccion: str = None):
         if direccion is None:
             temporal_actual = "t" + str(self.get_temporal())
             cuadruplo = Cuadruplo(operacion, operando_izq,
@@ -45,7 +45,7 @@ class GeneracionCuadruplos:
             return direccion
 
     def generar_cuadruplos(self):
-      
+
         for subtree in self.arbol.children:
             if subtree.data == "decvars":
                 pass
@@ -93,8 +93,40 @@ class GeneracionCuadruplos:
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
 
-    def generar_cuadruplos_llamadafuncion(self):
-        pass
+    # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
+    def generar_cuadruplos_llamadafuncion(self, arbol_llamadafuncion: Tree):
+        nombre_funcion = arbol_llamadafuncion.children[0].children[0]
+        lista_expresion_llamadafuncion = arbol_llamadafuncion.children[1:]
+
+        # foo(2+3,a*5)
+        # + 2 3 t0
+        # * a 5 t1
+        # param 0 t0
+        # param 1 t1
+        # call foo 2 t2
+
+        # Encontrar el valor de todos los argumentos (donde se va a guardar el resultado)
+        # lista_resultados_expresiones = []
+        # for expresion in lista_expresion_llamadafuncion:
+        #     res = self.generar_cuadruplos_expresion(expresion)
+        #     lista_resultados_expresiones.append(res)
+
+        # 1. Conseguir la dirección de los resultados de los argumentos
+
+        lista_resultados_expresiones = [
+            self.generar_cuadruplos_expresion(expresion)
+            for expresion in lista_expresion_llamadafuncion
+        ]
+
+        # 2.  Declarar los argumentos
+        for (index, resultado) in enumerate(lista_resultados_expresiones):
+            self.generar_cuadruplo_nuevo("param", str(index), resultado, "")
+
+        # 3. Generar el cuadruplo llamada funcion
+        direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
+            "call", nombre_funcion, len(lista_resultados_expresiones))
+        
+        return direccion_resultado_llamada
 
 
 ############### EXPRESION ##################
@@ -187,7 +219,8 @@ class GeneracionCuadruplos:
                 # + (a,[2,3]) 3 t0
                 # TODO FALTA TODO LO DE DIMENSIONES
             elif atomo.data == "llamadafuncion":
-                pass
+                return self.generar_cuadruplos_llamadafuncion(atomo)
+
             elif atomo.data == "funcionesespeciales":
                 pass
 
@@ -324,27 +357,28 @@ class GeneracionCuadruplos:
 
         self.generar_cuadruplos_asignacion(arbol_asignacion_for)
         variable = arbol_asignacion_for.children[0]
-        resultado_expresion = self.generar_cuadruplos_expresion(arbol_expresion_for)
+        resultado_expresion = self.generar_cuadruplos_expresion(
+            arbol_expresion_for)
 
         # # < a 10 t0   -> generar condicion y guardar su lugar
-        resultado_condicion = self.generar_cuadruplo_nuevo("<", variable, resultado_expresion)
-        posicion_condicion = len(self.listaCuadruplos) -1
+        resultado_condicion = self.generar_cuadruplo_nuevo(
+            "<", variable, resultado_expresion)
+        posicion_condicion = len(self.listaCuadruplos) - 1
 
         # gotof t0 _ -> generar gotof y guardar su lugar
-        self.generar_cuadruplo_nuevo("gotof",resultado_condicion,"","")
-        posicion_gotof = len(self.listaCuadruplos) -1
+        self.generar_cuadruplo_nuevo("gotof", resultado_condicion, "", "")
+        posicion_gotof = len(self.listaCuadruplos) - 1
 
-        #generar el cuerpo del for
+        # generar el cuerpo del for
         self.generar_cuadruplos_estatutos(arbol_estatutos_for)
 
-        #Incrementar la variable de control
-        resultado_incremento = self.generar_cuadruplo_nuevo("+",variable,"1")
-        self.generar_cuadruplo_nuevo("=",resultado_incremento,"",variable)
+        # Incrementar la variable de control
+        resultado_incremento = self.generar_cuadruplo_nuevo("+", variable, "1")
+        self.generar_cuadruplo_nuevo("=", resultado_incremento, "", variable)
 
-        #goto de regreso al a condicion
-        self.generar_cuadruplo_nuevo("goto","","",posicion_condicion)
+        # goto de regreso al a condicion
+        self.generar_cuadruplo_nuevo("goto", "", "", posicion_condicion)
 
-        #ponerle la direccion despues del for al gotof
+        # ponerle la direccion despues del for al gotof
         posicion_despues_for = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_gotof].temporal = posicion_despues_for
-

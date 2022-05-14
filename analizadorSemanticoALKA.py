@@ -264,7 +264,7 @@ class AnalizadorSemantico:
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
     def analizar_llamadafuncion(self, arbol_llamada_funcion: Tree) -> Tipo:
         nombre_funcion = arbol_llamada_funcion.children[0].children[0]
-        print(nombre_funcion)
+       
         lista_de_arboles_argumentos = arbol_llamada_funcion.children[1:]
 
         # 1. Checar que la funcion exista
