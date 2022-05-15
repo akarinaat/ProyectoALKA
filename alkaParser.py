@@ -70,7 +70,11 @@ ALKA_parser = Lark(
 
     decfuncs : decfunc*
 
-    decfunc : "func" tipo id  "(" (id tipo ("," id tipo)*)? ")"  "{" decvars estatutos "}"
+    decfunc : "func" tipo id  "(" parametros ")"  "{" decvars estatutos "}"
+
+    parametros :  (parametro ("," parametro)*)?
+
+    parametro : id tipo
 
     asignacion : llamadavariable "=" expresion
 

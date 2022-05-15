@@ -113,3 +113,17 @@ def test_llamadafuncion():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos()
     assert len(generador.listaCuadruplos) > 8
+
+
+def test_decfunc():
+    programa = """ 
+    func int foo(a int, b int){
+        a+b;
+    }
+    main(){
+        
+    }"""
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos()
+    print(generador.listaCuadruplos)
+    assert len(generador.listaCuadruplos) == 5

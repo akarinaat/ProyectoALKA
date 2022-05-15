@@ -102,15 +102,16 @@ class AnalizadorSemantico:
         nombre = str(subtree.children[1].children[0])
         if nombre in self.directorioFunciones:
             raise SemanticError("funcion ya existe")
-      
+
+        arbol_parametros = subtree.children[2]
         lista_parametros = []
         # declarar los argumentos
-        # print(subtree.children[2:-2], len(subtree.children[2:-2]))
-        for parametro in chunker(subtree.children[2:-2], 2):
-            nombre_parametro = parametro[0].children[0]
-            tipo_parametro = parametro[1].children[0]
+
+        for parametro in arbol_parametros.children:
+            nombre_parametro = parametro.children[0].children[0]
+            tipo_parametro = Tipo(parametro.children[1].children[0])
             lista_parametros.append(tipo_parametro)
-            self.declarar_variable(nombre_parametro, Tipo(tipo_parametro), 0)
+            self.declarar_variable(nombre_parametro, tipo_parametro, 0)
 
         decvars = subtree.children[-2]
         estatutos = subtree.children[-1].children
@@ -122,7 +123,8 @@ class AnalizadorSemantico:
         self.analizar_estatutos(estatutos)
         self.directoriosVariables.pop()
 
-        self.directorioFunciones[nombre] = Funcion(tipo, nombre,lista_parametros)
+        self.directorioFunciones[nombre] = Funcion(
+            tipo, nombre, lista_parametros)
 
 ######################### ANALIZAR ESTATUTOS #######################
 # A cada función de analizar le llega el arbol que le corresponde
@@ -264,7 +266,7 @@ class AnalizadorSemantico:
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
     def analizar_llamadafuncion(self, arbol_llamada_funcion: Tree) -> Tipo:
         nombre_funcion = arbol_llamada_funcion.children[0].children[0]
-       
+
         lista_de_arboles_argumentos = arbol_llamada_funcion.children[1:]
 
         # 1. Checar que la funcion exista
@@ -281,14 +283,13 @@ class AnalizadorSemantico:
             raise SemanticError("Cantidad incorrecta de argumentos")
 
         # 3. Checar que los argumentos sean del tipo correcto
-        for (argumento,tipo_parametro) in zip(lista_de_arboles_argumentos,funcion_declarada.parametros):
+        for (argumento, tipo_parametro) in zip(lista_de_arboles_argumentos, funcion_declarada.parametros):
             tipo_argumento = self.analizar_expresion(argumento)
             if tipo_argumento != tipo_parametro:
-                raise SemanticError("Tipos no on iguales")
-        
+                raise SemanticError(
+                    f"Tipos no on iguales: {tipo_argumento} != {tipo_parametro}")
+
         return funcion_declarada.tipo
-            
-        
 
     def analizar_operacion_binaria(self, operacion: Tree, funcion):
         lista_operandos = operacion.children[::2]

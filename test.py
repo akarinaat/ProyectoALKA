@@ -1,12 +1,17 @@
 
 from Cuadruplos import GeneracionCuadruplos
 from analizadorSemanticoALKA import AnalizadorSemantico
+from lark import tree
 
-programa = """main(){
-        var float: b;
-        b+3;
-    }"""
-generador = GeneracionCuadruplos(programa)
-generador.generar_cuadruplos()
-assert len(generador.listaCuadruplos) == 2
-print(generador.listaCuadruplos)
+programa = """
+        var int:a;
+        func int foo () {
+            var float: c;
+        }
+        main(){}"""
+
+analizador = AnalizadorSemantico(programa)
+analizador.analizarArbol()
+
+tree.pydot__tree_to_png(analizador.arbol,"test2.png")
+

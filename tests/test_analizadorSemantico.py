@@ -37,7 +37,17 @@ def test_analisis_decfunc():
 
     assert "foo" in analizador.directorioFunciones
     assert analizador.directorioFunciones["foo"].tipo == Tipo.Int
+    
+def test_analisis_decfunc_simple():
+    programa = """
+        var int:a;
+        func int foo () {
+            var float: c;
+        }
+        main(){}"""
 
+    analizador = AnalizadorSemantico(programa)
+    analizador.analizarArbol()
 
 def test_analisis_decfunc_error():
     programa = """

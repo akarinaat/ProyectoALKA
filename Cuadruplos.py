@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, Dict, List
 from analizadorSemanticoALKA import AnalizadorSemantico
 from lark import Token, Tree
 
@@ -11,6 +11,7 @@ class Cuadruplo:
     op1: str
     op2: str
     temporal: str
+
 
 @dataclass
 class Funcion:
@@ -25,8 +26,18 @@ class GeneracionCuadruplos:
     def __init__(self, programa):
         # Aquí se le hace appende de los cuadruplos generados
         self.listaCuadruplos: List[Cuadruplo] = []
+        # Necesito un directorio que teniendo el nombre,
+        # me diga cual es su dirección
+        # Puede ser una lista de directorios
+        # Y necesito otro para que me diga en qué
+        # línea está la función
+        # Directorio de funciones:
+        self.diccionarioFunciones: Dict[str,
+                                        Funcion] = {}  # tipos parametricos
+        # Lista de variables de funciones
         self.programa = programa
         self.temporal_actual = 0
+        self.direccion_actual = 0
 
         self.analizador = AnalizadorSemantico(programa)
         self.analizador.analizarArbol()
@@ -58,8 +69,7 @@ class GeneracionCuadruplos:
                 pass
                 # self.analizar_decvars(subtree)
             elif subtree.data == "decfuncs":
-                pass
-                # self.analizar_decfuncs(subtree)
+                self.generar_cuadruplos_decfuncs(subtree)
             elif subtree.data == "main":
                 self.generar_cuadruplos_main(subtree)
                 pass
@@ -67,12 +77,12 @@ class GeneracionCuadruplos:
     def generar_cuadruplos_main(self, subtree: Tree):
 
         for child in subtree.children:
+
             if child.data == "decvars":
                 # Generar cuádruplos
                 self.generar_cuadruplos_decvars(child)
             elif child.data == "estatutos":
                 self.generar_cuadruplos_estatutos(child)
-                pass
 
     def generar_cuadruplos_estatutos(self, estatutos: Tree):
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
@@ -132,8 +142,44 @@ class GeneracionCuadruplos:
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
             "call", nombre_funcion, len(lista_resultados_expresiones))
-        
+
         return direccion_resultado_llamada
+
+    # decfunc : "func" tipo id  "(" parameters ")"  "{" decvars estatutos "}"
+    # parameters : (id tipo ("," id tipo)*)?
+    def generar_cuadruplos_decfuncs(self, arbol_decfuncs: Tree):
+        for arbol_decfunc in arbol_decfuncs.children:
+            self.generar_cuadruplos_decfunc(arbol_decfunc)
+
+    def generar_cuadruplos_decfunc(self, arbol_decfunc: Tree):
+        tipo_decfunc = arbol_decfunc.children[0]
+        nombre_decfunc = arbol_decfunc.children[1]
+        arbol_parametros = arbol_decfunc.children[2]
+        arbol_decvars = arbol_decfunc.children[3]
+        arbol_estatutos = arbol_decfunc.children[4]
+
+        # decfunc tipo nombre  ERA (para la MV)
+
+        self.generar_cuadruplo_nuevo(
+            "decfunc", tipo_decfunc, nombre_decfunc, "")
+
+        # Para saber en qué cuadruplo voy
+        posicion_inicio = len(self.listaCuadruplos)-1
+
+        self.generar_cuadruplos_parametros(arbol_parametros)
+        self.generar_cuadruplos_decvars(arbol_decvars)
+        self.generar_cuadruplos_estatutos(arbol_estatutos)
+
+        self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
+
+    def generar_cuadruplos_parametros(self, arbol_parametros: Tree):
+        for parametro in arbol_parametros.children:
+            nombre_parametro = parametro.children[0].children[0]
+            tipo_parametro = parametro.children[1].children[0]
+            self.generar_cuadruplo_nuevo(
+                "decvar", tipo_parametro, "", nombre_parametro)
+
+
 
 
 ############### EXPRESION ##################
