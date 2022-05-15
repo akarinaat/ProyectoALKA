@@ -148,3 +148,17 @@ Mypy
 
 Fecha de entrega Mayo 8 2022
 
+## Quinta entrega:
+
+- Se cambió la gramática de decfuncs, hice un arbol parametros 
+- Generación de cuádruplos de decfuncs (no al 100% todavía, pero sí los genera)
+- Agregé pruebas de generar cuadruplos decfunc
+- Agregué prueba de generar cuadruplo llamada función
+- Análisis de llamadafuncion
+- Generación cuadruplos llamadafuncion
+- Generé .png para tener una referencia visual
+
+Fecha de entrega: Mayo 15 2022
+
+
+

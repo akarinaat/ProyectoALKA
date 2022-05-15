@@ -5,7 +5,7 @@ from lark import tree
 
 programa = """
         var int:a;
-        func int foo () {
+        func int foo (h int, b int) {
             var float: c;
         }
         main(){}"""
@@ -13,5 +13,5 @@ programa = """
 analizador = AnalizadorSemantico(programa)
 analizador.analizarArbol()
 
-tree.pydot__tree_to_png(analizador.arbol,"test2.png")
+tree.pydot__tree_to_png(analizador.arbol,"test_conParametros.png")
 

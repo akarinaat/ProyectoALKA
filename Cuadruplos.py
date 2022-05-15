@@ -159,7 +159,7 @@ class GeneracionCuadruplos:
         arbol_estatutos = arbol_decfunc.children[4]
 
         # decfunc tipo nombre  ERA (para la MV)
-
+        # TODO FALTA ERA
         self.generar_cuadruplo_nuevo(
             "decfunc", tipo_decfunc, nombre_decfunc, "")
 
