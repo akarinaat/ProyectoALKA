@@ -159,7 +159,7 @@ Fecha de entrega Mayo 8 2022
 - Generé .png para tener una referencia visual
 - Falta la parte de ERA pero lo veo en Maquina Virtual
 
-Fecha de entrega: Mayo 15 2022
+Fecha de entrega: Mayo 16 2022
 
 
 

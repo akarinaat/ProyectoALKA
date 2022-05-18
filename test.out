@@ -1,0 +1,7 @@
+decvar,float,[],b
+decvar,int,[],a
+decvar,int,[],c
+decvar,int,[],d
+decvar,int,[],f
++,b,3.2,t0
+*,b,1235.2,t1

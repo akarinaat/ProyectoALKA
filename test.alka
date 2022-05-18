@@ -1,0 +1,6 @@
+main(){
+    var float: b;
+    var int : a,c,d,f;
+    b+3.2;
+    b * 1235.2;
+}

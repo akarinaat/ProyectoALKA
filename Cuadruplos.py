@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List
 from analizadorSemanticoALKA import AnalizadorSemantico
 from lark import Token, Tree
+import sys
 
 
 @dataclass
@@ -11,6 +12,11 @@ class Cuadruplo:
     op1: str
     op2: str
     temporal: str
+    # cuando use la funcion str en un cuadruplo
+    # para cuadno lo mande al archivo de abajo
+
+    def __str__(self) -> str:
+        return f"{self.operacion},{self.op1},{self.op2},{self.temporal}\n"
 
 
 @dataclass
@@ -23,8 +29,9 @@ class Funcion:
 
 class GeneracionCuadruplos:
 
-    def __init__(self, programa):
+    def __init__(self, programa):  # el programa que le llega de pruebas
         # Aquí se le hace appende de los cuadruplos generados
+        # En el paso de la mv, necesito procesar estos a str
         self.listaCuadruplos: List[Cuadruplo] = []
         # Necesito un directorio que teniendo el nombre,
         # me diga cual es su dirección
@@ -39,8 +46,11 @@ class GeneracionCuadruplos:
         self.temporal_actual = 0
         self.direccion_actual = 0
 
+        # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
         self.analizador = AnalizadorSemantico(programa)
+        # En analizador semántico genera un árbol
         self.analizador.analizarArbol()
+        # guarda el arbol
         self.arbol = self.analizador.arbol
 
     def get_temporal(self):
@@ -178,8 +188,6 @@ class GeneracionCuadruplos:
             tipo_parametro = parametro.children[1].children[0]
             self.generar_cuadruplo_nuevo(
                 "decvar", tipo_parametro, "", nombre_parametro)
-
-
 
 
 ############### EXPRESION ##################
@@ -435,3 +443,25 @@ class GeneracionCuadruplos:
         # ponerle la direccion despues del for al gotof
         posicion_despues_for = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_gotof].temporal = posicion_despues_for
+
+    def hacer_string_cuadruplos(self) -> List[str]:
+        lista_string_cuadruplos = [str(cuadruplo)
+                                   for cuadruplo in self.listaCuadruplos
+                                   ]
+        return lista_string_cuadruplos
+
+
+if __name__ == "__main__":
+
+    # Voy a leer el archivo que contiene el código fuente
+    # ArchivoIn tiene el string de lo que es el programa (tipo el string que hay en las pruebas, not exactly but like that)
+    archivoIn = sys.argv[1]
+    # Es el que contiene el código intermedio
+    archivoOut = sys.argv[2]
+    # Abre y cierra sin el close
+    with open(archivoIn, "r") as codigo:
+        generador = GeneracionCuadruplos(codigo.read())
+        generador.generar_cuadruplos()  # genero lista de cuadruplos
+        lista_strings = generador.hacer_string_cuadruplos()
+        with open(archivoOut, "w") as cuadruplos:
+            cuadruplos.writelines(lista_strings)
