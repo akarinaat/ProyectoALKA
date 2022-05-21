@@ -5,7 +5,7 @@ from Cuadruplos import GeneracionCuadruplos
 def test_prueba_basica():
     programa = """ main(){2+-3;} """
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
     assert len(generador.listaCuadruplos) == 2
 
@@ -16,7 +16,7 @@ def test_prueba_asignacion():
                 a = 3;
                 } """
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 2
 
 
@@ -25,7 +25,7 @@ def test_prueba_decvar():
         var float: b;
     }"""
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 1
 
 
@@ -35,7 +35,7 @@ def test_expresion_llamada_var():
         b+3.2;
     }"""
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 2
     assert generador.listaCuadruplos[1].op1 == "b"
 
@@ -56,7 +56,7 @@ def test_if():
         };
     } """
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 6
 
 
@@ -68,7 +68,7 @@ def test_while():
         };
     } """
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 5
 
 
@@ -98,7 +98,7 @@ def test_for():
     # = t2  a
     # goto condicion -> hacer goto a la posicion de la condicion
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 8
 
 
@@ -111,7 +111,7 @@ def test_llamadafuncion():
         foo(2*3,5+4);
     }"""
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) > 8
 
 
@@ -124,6 +124,6 @@ def test_decfunc():
         
     }"""
     generador = GeneracionCuadruplos(programa)
-    generador.generar_cuadruplos()
+    generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
     assert len(generador.listaCuadruplos) == 5

@@ -12,9 +12,13 @@ class MaquinaVirtual:
 
         self.lista_cuadruplos = cuadruplos.split("\n")
 
+# osea de tipos
+# local temporal etc
         self.memoria_parametros = []
         self.memoria_temporales = []
         self.memoria_funciones = []
+
+        self.pila_brincos_endFunc = []
 
         self.instruccion_actual = 0
 

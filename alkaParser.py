@@ -59,7 +59,6 @@ ALKA_parser = Lark(
 
     id : ID
 
-    
     programa : decvars decfuncs main
 
     main : "main" "(" ")" "{" decvars estatutos "}"

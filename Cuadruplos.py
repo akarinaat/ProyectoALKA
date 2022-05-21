@@ -1,8 +1,20 @@
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Dict, List
+from Memoria import Memoria
 from analizadorSemanticoALKA import AnalizadorSemantico
 from lark import Token, Tree
 import sys
+
+
+string_ops = "* / + - decfunc decvar < > != = param goto gotof call".split()
+Operaciones = dict(zip(string_ops, range(len(string_ops))))
+# {'*': 0, '/': 1, '+': 2, '-': 3, 'decfunc': 4, 'decvar': 5, '<': 6, '>': 7, '!=': 8, '=': 9, 'param': 10, 'goto': 11, 'gotof': 12, 'call': 13}
+
+
+class Alcance(Enum):
+    alcance_global = auto()
+    alcance_local = auto()
 
 
 @dataclass
@@ -46,6 +58,10 @@ class GeneracionCuadruplos:
         self.temporal_actual = 0
         self.direccion_actual = 0
 
+        # Esta es para pasar de los nombres a direcciones
+        # recibe un str y nos regresa un int (la dirección)
+        self.directorio_direcciones: Dict[str, int] = {}
+
         # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
         self.analizador = AnalizadorSemantico(programa)
         # En analizador semántico genera un árbol
@@ -53,13 +69,19 @@ class GeneracionCuadruplos:
         # guarda el arbol
         self.arbol = self.analizador.arbol
 
+        # Para saber direcciones y cantidades de variables globales,
+        self.memoria_global = Memoria()
+
+        # Para saber direcciones / cantidades variables locales
+        self.memoria_stack: List[Memoria] = []
+
     def get_temporal(self):
         """Para saber en qué temporal voy"""
         temporal_actual = self.temporal_actual
         self.temporal_actual += 1
         return temporal_actual
 
-    def generar_cuadruplo_nuevo(self, operacion: str, operando_izq: str, operando_der: str, direccion: str = None):
+    def generar_cuadruplo_nuevo(self, operacion: Operaciones, operando_izq: str, operando_der: str, direccion: str = None):
         if direccion is None:
             temporal_actual = "t" + str(self.get_temporal())
             cuadruplo = Cuadruplo(operacion, operando_izq,
@@ -72,12 +94,12 @@ class GeneracionCuadruplos:
             self.listaCuadruplos.append(cuadruplo)
             return direccion
 
-    def generar_cuadruplos(self):
+    def generar_cuadruplos_programa(self):
 
         for subtree in self.arbol.children:
             if subtree.data == "decvars":
-                pass
-                # self.analizar_decvars(subtree)
+                self.generar_cuadruplos_decvars(
+                    subtree, Alcance.alcance_global)  # decvars globales
             elif subtree.data == "decfuncs":
                 self.generar_cuadruplos_decfuncs(subtree)
             elif subtree.data == "main":
@@ -90,7 +112,7 @@ class GeneracionCuadruplos:
 
             if child.data == "decvars":
                 # Generar cuádruplos
-                self.generar_cuadruplos_decvars(child)
+                self.generar_cuadruplos_decvars(child, Alcance.alcance_local)
             elif child.data == "estatutos":
                 self.generar_cuadruplos_estatutos(child)
 
@@ -177,7 +199,8 @@ class GeneracionCuadruplos:
         posicion_inicio = len(self.listaCuadruplos)-1
 
         self.generar_cuadruplos_parametros(arbol_parametros)
-        self.generar_cuadruplos_decvars(arbol_decvars)
+        self.generar_cuadruplos_decvars(
+            arbol_decvars, Alcance.alcance_local)  # dentro de funcion es local
         self.generar_cuadruplos_estatutos(arbol_estatutos)
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
@@ -191,7 +214,6 @@ class GeneracionCuadruplos:
 
 
 ############### EXPRESION ##################
-
 
     def generar_cuadruplos_expresion(self, expresion: Tree):
 
@@ -305,15 +327,15 @@ class GeneracionCuadruplos:
         print(id_var, "el nombre de llamada variable")
         return id_var
 
-    def generar_cuadruplos_decvars(self, decvars: Tree):
+    def generar_cuadruplos_decvars(self, decvars: Tree, alcance: Alcance):
 
         for decvar in decvars.children:
-            self.generar_cuadruplos_decvar(decvar)
+            self.generar_cuadruplos_decvar(decvar, alcance)
 
-    def generar_cuadruplos_decvar(self, decvar: Tree):
+    def generar_cuadruplos_decvar(self, decvar: Tree, alcance: Alcance):
         # cuadruplo de decvar:
         # decvar tipo dimensiones nombre
-        # 3???????este porque no está dentro del for?
+
         tipo = decvar.children[0].children[0]
         variables = decvar.children[1:]
         for variable in variables:
@@ -461,7 +483,7 @@ if __name__ == "__main__":
     # Abre y cierra sin el close
     with open(archivoIn, "r") as codigo:
         generador = GeneracionCuadruplos(codigo.read())
-        generador.generar_cuadruplos()  # genero lista de cuadruplos
+        generador.generar_cuadruplos_programa()  # genero lista de cuadruplos
         lista_strings = generador.hacer_string_cuadruplos()
         with open(archivoOut, "w") as cuadruplos:
             cuadruplos.writelines(lista_strings)
