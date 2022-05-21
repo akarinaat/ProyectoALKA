@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any, Dict, List
 from Memoria import Memoria
-from analizadorSemanticoALKA import AnalizadorSemantico
+from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
 from lark import Token, Tree
 import sys
 
@@ -60,7 +60,11 @@ class GeneracionCuadruplos:
 
         # Esta es para pasar de los nombres a direcciones
         # recibe un str y nos regresa un int (la dirección)
-        self.directorio_direcciones: Dict[str, int] = {}
+        self.directorio_variables_globales: Dict[str, int] = {}
+
+        # Cuando se llama una funcion, se mete un directorio nuevo
+        # Cuando termina la funcion, se saca un directorio
+        self.directorio_variables_locales: List[Dict[str, int]] = []
 
         # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
         self.analizador = AnalizadorSemantico(programa)
@@ -337,22 +341,49 @@ class GeneracionCuadruplos:
         # decvar tipo dimensiones nombre
 
         tipo = decvar.children[0].children[0]
+
         variables = decvar.children[1:]
         for variable in variables:
+
             nombre = variable.children[0].children[0]
 
-            expresiones_dimensiones = variable.children[1:]
+            # Conseguir la direccion de la variable
+            direccion_variable = 0
+            if alcance == Alcance.alcance_global:
+
+                # Direccion base del tipo, mas cuantos de ese tipo hay
+                direccion_variable = self.memoria_global.direcciones_base[tipo] + \
+                    self.memoria_global.contadores_tipo_unidimensional[tipo]
+                # incrementar el contador de variables de su tipo.
+                self.memoria_global.contadores_tipo_unidimensional[tipo] += 1
+
+                self.directorio_variables_globales[nombre] = direccion_variable
+            elif alcance == Alcance.alcance_local:
+                direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
+                    self.memoria_stack[-1].contadores_tipo_unidimensional[tipo]
+                # incrementar el contador de variables de su tipo.
+                self.memoria_stack[-1].contadores_tipo_unidimensional[tipo] += 1
+
+                self.directorio_variables_locales[-1][nombre] = direccion_variable
+
+            else:
+                raise SemanticError("Error al compilar, alcance no definido")
+
+            lista_expresiones_dimensiones = variable.children[1:]
+            cantidad_expresiones = len(lista_expresiones_dimensiones)
+
+            # generar los cuádruplos de las expresiones de las dimensiones
             temporales_dimensiones = [
                 self.generar_cuadruplos_expresion(expresion)
-                for expresion in expresiones_dimensiones
+                for expresion in lista_expresiones_dimensiones
             ]
 
             dimensiones_str = str(temporales_dimensiones)
-            # generar los cuádruplos de las expresiones de las dimensiones
-            self.generar_cuadruplo_nuevo(
-                "decvar", tipo, dimensiones_str, str(nombre))
+            # self.generar_cuadruplo_nuevo(
+            #     "decvar", tipo, dimensiones_str, str(nombre))
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
+
     def generar_cuadruplos_while(self, arbol_while: Tree):
         arbol_expresion_while = arbol_while.children[0]
         # Aqui ya no le pongo el .children porque generar
