@@ -182,8 +182,8 @@ class GeneracionCuadruplos:
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "call", direccion_funcion, len(lista_resultados_expresiones))
-
+            "call", direccion_funcion, len(lista_resultados_expresiones)) # antes estaba el nombre
+                                                                        # nombre_funcion
         return direccion_resultado_llamada
 
     # decfunc : "func" tipo id  "(" parameters ")"  "{" decvars estatutos "}"

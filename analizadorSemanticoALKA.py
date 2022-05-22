@@ -1,3 +1,4 @@
+from ctypes import Union
 from typing import Dict, List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
@@ -120,7 +121,13 @@ class AnalizadorSemantico:
             self.analizar_decvar(decvar)
 
         # analizar el cuerpo de la función
-        self.analizar_estatutos(estatutos)
+        lista_tipos_return = self.analizar_estatutos(estatutos, tipo)
+
+        for tipo_return in lista_tipos_return:
+            if tipo_return != tipo:
+                raise SemanticError("No se puede regresar un tipo diferente a la función")
+        # Cuando acabo de analizar las variables locales
+        # las borro, por eso el pop
         self.directoriosVariables.pop()
 
         self.directorioFunciones[nombre] = Funcion(
@@ -131,11 +138,14 @@ class AnalizadorSemantico:
 # Se asigna una a variable al valor de los nodos
 #    Se analizan los valores
 
-    def analizar_estatutos(self, estatutos: List[Tree]) -> None:
+    def analizar_estatutos(self, estatutos: List[Tree]) -> List[Tipo]:
+        results: List[Tipo] = []
         for estatuto in estatutos:
-            self.analizar_estatuto(estatuto)
+            tipo_resultado = self.analizar_estatuto(estatuto)
+            results += tipo_resultado
+        return results
 
-    def analizar_estatuto(self, estatuto: Tree) -> None:
+    def analizar_estatuto(self, estatuto: Tree) -> Union[Tipo, None]:
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
         # El unico que regresa un valor es el return
 
@@ -149,16 +159,16 @@ class AnalizadorSemantico:
             self.analizar_llamadafuncion(estatuto.children[0])
 
         elif estatuto.children[0].data == "if":
-            self.analizar_if(estatuto.children[0])
+            return self.analizar_if(estatuto.children[0])
 
         elif estatuto.children[0].data == "return":
-            self.analizar_return(estatuto.children[0])
+            return self.analizar_return(estatuto.children[0])
 
         elif estatuto.children[0].data == "forloop":
-            self.analizar_for(estatuto.children[0])
+            return self.analizar_for(estatuto.children[0])
 
         elif estatuto.children[0].data == "while":
-            self.analizar_while(estatuto.children[0])
+            return self.analizar_while(estatuto.children[0])
 
     def analizar_asignacion(self, arbol_asignacion: Tree) -> Tipo:
         # llamadavariable "=" expresion
@@ -302,7 +312,7 @@ class AnalizadorSemantico:
         return tipo
 
     # if : "if" "(" expresion ")" "{" estatutos "}" else
-    def analizar_if(self, arbol_if: Tree):
+    def analizar_if(self, arbol_if: Tree) -> List[Tipo]:
         arbol_expresion = arbol_if.children[0]
         arbol_estatutos = arbol_if.children[1]
         arbol_else = arbol_if.children[2]
@@ -311,12 +321,16 @@ class AnalizadorSemantico:
         if tipo_arbol_expresion != Tipo.Bool:
             raise SemanticError("Tipo no booleano")
 
-        self.analizar_estatutos(arbol_estatutos.children)
-        self.analizar_else(arbol_else)
+        lista_tipos_return_if = self.analizar_estatutos(
+            arbol_estatutos.children)
+        lista_tipos_return_else = self.analizar_else(arbol_else)
 
-    def analizar_else(self, arbol_else: Tree) -> None:
-        if len(arbol_else.children) != 0:
-            self.analizar_estatutos(arbol_else.children[0].children)
+        # esto es para analizar los tipos de expresiones return dentro de los estatutos
+        return lista_tipos_return_if + lista_tipos_return_else
+
+    def analizar_else(self, arbol_else: Tree) -> List[Tipo]:
+
+        return self.analizar_estatutos(arbol_else.children[0].children)
 
     def analizar_return(self, arbol_return: Tree) -> Tipo:
         expresion = arbol_return.children[0]
@@ -324,18 +338,21 @@ class AnalizadorSemantico:
         return self.analizar_expresion(expresion)
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
-    def analizar_while(self, arbol_while: Tree):
+    def analizar_while(self, arbol_while: Tree) -> List[Tipo]:
         arbol_expresion_while = arbol_while.children[0]
         arbol_estatutos_while = arbol_while.children[1]
 
         tipo_expresion_while = self.analizar_expresion(arbol_expresion_while)
-        self.analizar_estatutos(arbol_estatutos_while.children)
+        lista_tipos_return = self.analizar_estatutos(
+            arbol_estatutos_while.children)
 
         if tipo_expresion_while != Tipo.Bool:
             raise SemanticError("Tipo no booleano")
 
+        return lista_tipos_return
+
     # forloop : "for" asignacion "to" expresion "{" estatutos "}"
-    def analizar_for(self, arbol_forloop: Tree):
+    def analizar_for(self, arbol_forloop: Tree) -> List[Tipo]:
         arbol_asignacion_for = arbol_forloop.children[0]
         arbbol_expresion_for = arbol_forloop.children[1]
         arbol_estaturos_for = arbol_forloop.children[2]
@@ -348,7 +365,7 @@ class AnalizadorSemantico:
         if tipo_expresion_for != Tipo.Int:
             raise SemanticError("Variable tiene que ser entero")
 
-        self.analizar_estatutos(arbol_estaturos_for.children)
+        return self.analizar_estatutos(arbol_estaturos_for.children)
 
 
 def get_token(subtree: Tree, token_type: str):
