@@ -225,10 +225,17 @@ class GeneracionCuadruplos:
             self.generar_cuadruplo_nuevo(
                 "decvar", tipo_parametro, "", nombre_parametro)
 
+    # return : "return" expresion
+    def generar_cuadruplos_return(self, arbol_return: Tree):
+       direccion_valor_return = self.generar_cuadruplos_expresion(arbol_return)
+       self.generar_cuadruplo_nuevo("return","","",direccion_valor_return)
+
+
 
 ############### EXPRESION ##################
 
-    def generar_cuadruplos_expresion(self, expresion: Tree):
+    def generar_cuadruplos_expresion(self, expresion: Tree)->str:
+        # regresa la dirección de donde se guardó el resultado de la expresión
 
         if len(expresion.children) == 1:
             exp = expresion.children[0]
