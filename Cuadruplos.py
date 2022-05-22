@@ -151,12 +151,17 @@ class GeneracionCuadruplos:
         nombre_funcion = arbol_llamadafuncion.children[0].children[0]
         lista_expresion_llamadafuncion = arbol_llamadafuncion.children[1:]
 
+        #conseguir la direccin de la funcion, lo hago con el nombre de la misma
+        direccion_funcion = self.diccionarioFunciones[nombre_funcion]
+
         # foo(2+3,a*5)
         # + 2 3 t0
         # * a 5 t1
         # param 0 t0
         # param 1 t1
-        # call foo 2 t2
+        # call foo 2 t2 ---> AHORA SERÁ CALL LA DIRECCIÓN DE FOO
+
+    
 
         # Encontrar el valor de todos los argumentos (donde se va a guardar el resultado)
         # lista_resultados_expresiones = []
@@ -177,7 +182,7 @@ class GeneracionCuadruplos:
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "call", nombre_funcion, len(lista_resultados_expresiones))
+            "call", direccion_funcion, len(lista_resultados_expresiones))
 
         return direccion_resultado_llamada
 
@@ -196,11 +201,15 @@ class GeneracionCuadruplos:
 
         # decfunc tipo nombre  ERA (para la MV)
         # TODO FALTA ERA
-        self.generar_cuadruplo_nuevo(
-            "decfunc", tipo_decfunc, nombre_decfunc, "")
+        # self.generar_cuadruplo_nuevo(
+        #     "decfunc", tipo_decfunc, nombre_decfunc, "")
 
         # Para saber en qué cuadruplo voy
-        posicion_inicio = len(self.listaCuadruplos)-1
+        posicion_inicio = len(self.listaCuadruplos)
+
+        ## Meter func en directorio funciones
+
+        self.diccionarioFunciones[nombre_decfunc] = posicion_inicio
 
         self.generar_cuadruplos_parametros(arbol_parametros)
         self.generar_cuadruplos_decvars(
