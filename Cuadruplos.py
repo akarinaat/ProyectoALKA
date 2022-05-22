@@ -151,7 +151,9 @@ class GeneracionCuadruplos:
         nombre_funcion = arbol_llamadafuncion.children[0].children[0]
         lista_expresion_llamadafuncion = arbol_llamadafuncion.children[1:]
 
-        #conseguir la direccin de la funcion, lo hago con el nombre de la misma
+        self.generar_cuadruplo_nuevo("ERA", nombre_funcion, "", "")
+
+        # conseguir la direccin de la funcion, lo hago con el nombre de la misma
         direccion_funcion = self.diccionarioFunciones[nombre_funcion]
 
         # foo(2+3,a*5)
@@ -160,8 +162,6 @@ class GeneracionCuadruplos:
         # param 0 t0
         # param 1 t1
         # call foo 2 t2 ---> AHORA SERÁ CALL LA DIRECCIÓN DE FOO
-
-    
 
         # Encontrar el valor de todos los argumentos (donde se va a guardar el resultado)
         # lista_resultados_expresiones = []
@@ -178,12 +178,13 @@ class GeneracionCuadruplos:
 
         # 2.  Declarar los argumentos
         for (index, resultado) in enumerate(lista_resultados_expresiones):
-            self.generar_cuadruplo_nuevo("param", str(index), resultado, "")
+            self.generar_cuadruplo_nuevo(
+                "param", "", resultado, "p"+str(index))
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "call", direccion_funcion, len(lista_resultados_expresiones)) # antes estaba el nombre
-                                                                        # nombre_funcion
+            "call", direccion_funcion, len(lista_resultados_expresiones))  # antes estaba el nombre
+        # nombre_funcion
         return direccion_resultado_llamada
 
     # decfunc : "func" tipo id  "(" parameters ")"  "{" decvars estatutos "}"
@@ -207,7 +208,7 @@ class GeneracionCuadruplos:
         # Para saber en qué cuadruplo voy
         posicion_inicio = len(self.listaCuadruplos)
 
-        ## Meter func en directorio funciones
+        # Meter func en directorio funciones
 
         self.diccionarioFunciones[nombre_decfunc] = posicion_inicio
 
@@ -227,14 +228,15 @@ class GeneracionCuadruplos:
 
     # return : "return" expresion
     def generar_cuadruplos_return(self, arbol_return: Tree):
-       direccion_valor_return = self.generar_cuadruplos_expresion(arbol_return)
-       self.generar_cuadruplo_nuevo("return","","",direccion_valor_return)
-
+        direccion_valor_return = self.generar_cuadruplos_expresion(
+            arbol_return)
+        self.generar_cuadruplo_nuevo("return", "", "", direccion_valor_return)
 
 
 ############### EXPRESION ##################
 
-    def generar_cuadruplos_expresion(self, expresion: Tree)->str:
+
+    def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
 
         if len(expresion.children) == 1:
@@ -372,15 +374,17 @@ class GeneracionCuadruplos:
                     self.memoria_global.contadores_tipo_unidimensional[tipo]
                 # incrementar el contador de variables de su tipo.
                 self.memoria_global.contadores_tipo_unidimensional[tipo] += 1
-
-                self.directorio_variables_globales[nombre] = direccion_variable
+                # Prefijo variables globales es "g"
+                self.directorio_variables_globales[nombre] = "g" + \
+                    direccion_variable
             elif alcance == Alcance.alcance_local:
                 direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
                     self.memoria_stack[-1].contadores_tipo_unidimensional[tipo]
                 # incrementar el contador de variables de su tipo.
                 self.memoria_stack[-1].contadores_tipo_unidimensional[tipo] += 1
-
-                self.directorio_variables_locales[-1][nombre] = direccion_variable
+                # Prefijo variables locales es "l"
+                self.directorio_variables_locales[-1][nombre] = "l" + \
+                    direccion_variable
 
             else:
                 raise SemanticError("Error al compilar, alcance no definido")
