@@ -65,7 +65,7 @@ ALKA_parser = Lark(
 
     decvars : decvar*
 
-    decvar:  "var" tipo ":" llamadavariable ("," llamadavariable)* ";"
+    decvar:  "var" tipo ":" iddecvar ("," iddecvar)* ";"
 
     decfuncs : decfunc*
 
@@ -104,6 +104,8 @@ ALKA_parser = Lark(
     llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
     llamadavariable : id ("[" expresion "]" )*
+
+    iddecvar: id ("[" CTEI "]" )*
 
     tipo : INT | STRING | FLOAT | BOOL
 

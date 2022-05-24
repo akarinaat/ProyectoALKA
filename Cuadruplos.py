@@ -64,7 +64,7 @@ class GeneracionCuadruplos:
 
         # Cuando se llama una funcion, se mete un directorio nuevo
         # Cuando termina la funcion, se saca un directorio
-        self.directorio_variables_locales: List[Dict[str, int]] = []
+        self.directorio_variables_locales: List[Dict[str, int]] = [{}]
 
         # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
         self.analizador = AnalizadorSemantico(programa)
@@ -77,7 +77,7 @@ class GeneracionCuadruplos:
         self.memoria_global = Memoria()
 
         # Para saber direcciones / cantidades variables locales
-        self.memoria_stack: List[Memoria] = []
+        self.memoria_stack: List[Memoria] = [Memoria()]
 
     def get_temporal(self):
         """Para saber en qué temporal voy"""
@@ -153,6 +153,7 @@ class GeneracionCuadruplos:
 
         self.generar_cuadruplo_nuevo("ERA", nombre_funcion, "", "")
 
+        print(self.diccionarioFunciones)
         # conseguir la direccin de la funcion, lo hago con el nombre de la misma
         direccion_funcion = self.diccionarioFunciones[nombre_funcion]
 
@@ -195,7 +196,7 @@ class GeneracionCuadruplos:
 
     def generar_cuadruplos_decfunc(self, arbol_decfunc: Tree):
         tipo_decfunc = arbol_decfunc.children[0]
-        nombre_decfunc = arbol_decfunc.children[1]
+        nombre_decfunc = arbol_decfunc.children[1].children[0]
         arbol_parametros = arbol_decfunc.children[2]
         arbol_decvars = arbol_decfunc.children[3]
         arbol_estatutos = arbol_decfunc.children[4]
@@ -374,17 +375,18 @@ class GeneracionCuadruplos:
                     self.memoria_global.contadores_tipo_unidimensional[tipo]
                 # incrementar el contador de variables de su tipo.
                 self.memoria_global.contadores_tipo_unidimensional[tipo] += 1
-                # Prefijo variables globales es "g"
-                self.directorio_variables_globales[nombre] = "g" + \
-                    direccion_variable
+                # Prefijo variables globales es "1"
+                self.directorio_variables_globales[nombre] = "1" + \
+                    str(direccion_variable)
             elif alcance == Alcance.alcance_local:
+                print(self.memoria_stack)
                 direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
-                    self.memoria_stack[-1].contadores_tipo_unidimensional[tipo]
+                    self.memoria_stack[-1].contadores_tipo_variables[tipo]
                 # incrementar el contador de variables de su tipo.
-                self.memoria_stack[-1].contadores_tipo_unidimensional[tipo] += 1
-                # Prefijo variables locales es "l"
-                self.directorio_variables_locales[-1][nombre] = "l" + \
-                    direccion_variable
+                self.memoria_stack[-1].contadores_tipo_variables[tipo] += 1
+                # Prefijo variables locales es "2"
+                self.directorio_variables_locales[-1][nombre] = "2" + \
+                    str(direccion_variable)
 
             else:
                 raise SemanticError("Error al compilar, alcance no definido")

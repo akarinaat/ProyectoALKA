@@ -121,11 +121,12 @@ class AnalizadorSemantico:
             self.analizar_decvar(decvar)
 
         # analizar el cuerpo de la función
-        lista_tipos_return = self.analizar_estatutos(estatutos, tipo)
+        lista_tipos_return = self.analizar_estatutos(estatutos)
 
         for tipo_return in lista_tipos_return:
             if tipo_return != tipo:
-                raise SemanticError("No se puede regresar un tipo diferente a la función")
+                raise SemanticError(
+                    "No se puede regresar un tipo diferente a la función")
         # Cuando acabo de analizar las variables locales
         # las borro, por eso el pop
         self.directoriosVariables.pop()
@@ -142,10 +143,10 @@ class AnalizadorSemantico:
         results: List[Tipo] = []
         for estatuto in estatutos:
             tipo_resultado = self.analizar_estatuto(estatuto)
-            results += tipo_resultado
+            results = results + tipo_resultado if tipo_resultado is not None else results
         return results
 
-    def analizar_estatuto(self, estatuto: Tree) -> Union[Tipo, None]:
+    def analizar_estatuto(self, estatuto: Tree):
         # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
         # El unico que regresa un valor es el return
 
@@ -329,13 +330,14 @@ class AnalizadorSemantico:
         return lista_tipos_return_if + lista_tipos_return_else
 
     def analizar_else(self, arbol_else: Tree) -> List[Tipo]:
+        if arbol_else.children:
+            return self.analizar_estatutos(arbol_else.children[0].children)
+        return []
 
-        return self.analizar_estatutos(arbol_else.children[0].children)
-
-    def analizar_return(self, arbol_return: Tree) -> Tipo:
+    def analizar_return(self, arbol_return: Tree) -> List[Tipo]:
         expresion = arbol_return.children[0]
         # Regresa un tipo
-        return self.analizar_expresion(expresion)
+        return [self.analizar_expresion(expresion)]
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
     def analizar_while(self, arbol_while: Tree) -> List[Tipo]:

@@ -17,7 +17,7 @@ def test_prueba_asignacion():
                 } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 2
+    assert len(generador.listaCuadruplos) == 1
 
 
 def test_prueba_decvar():
@@ -26,7 +26,7 @@ def test_prueba_decvar():
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 1
+    assert len(generador.listaCuadruplos) == 0
 
 
 def test_expresion_llamada_var():
@@ -36,8 +36,8 @@ def test_expresion_llamada_var():
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 2
-    assert generador.listaCuadruplos[1].op1 == "b"
+    assert len(generador.listaCuadruplos) == 1
+    assert generador.listaCuadruplos[0].op1 == "b"
 
 
 def test_if():
@@ -57,7 +57,7 @@ def test_if():
     } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 6
+    assert len(generador.listaCuadruplos) == 4
 
 
 def test_while():
@@ -69,7 +69,7 @@ def test_while():
     } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 5
+    assert len(generador.listaCuadruplos) == 4
 
 
 def test_for():
@@ -99,7 +99,8 @@ def test_for():
     # goto condicion -> hacer goto a la posicion de la condicion
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 8
+    print(generador.listaCuadruplos)
+    assert len(generador.listaCuadruplos) == 7
 
 
 def test_llamadafuncion():
@@ -126,4 +127,4 @@ def test_decfunc():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 5
+    assert len(generador.listaCuadruplos) == 4
