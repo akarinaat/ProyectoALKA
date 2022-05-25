@@ -46,7 +46,9 @@ class GeneracionCuadruplos:
     def __init__(self, programa):  # el programa que le llega de pruebas
         # Aquí se le hace appende de los cuadruplos generados
         # En el paso de la mv, necesito procesar estos a str
-        self.listaCuadruplos: List[Cuadruplo] = []
+
+        # se inicializa con el cuadruplo de goto main
+        self.listaCuadruplos: List[Cuadruplo] = [Cuadruplo("goto", "", "", "")]
         # Necesito un directorio que teniendo el nombre,
         # me diga cual es su dirección
         # Puede ser una lista de directorios
@@ -66,7 +68,6 @@ class GeneracionCuadruplos:
         # Lista de variables de funciones
         self.programa = programa
         self.temporal_actual = 0
-        self.direccion_actual = 0
 
         # Esta es para pasar de los nombres a direcciones
         # recibe un str y nos regresa un int (la dirección)
@@ -89,15 +90,6 @@ class GeneracionCuadruplos:
         # Para saber direcciones / cantidades variables locales
         self.memoria_stack: List[Memoria] = [Memoria()]
 
-    def direccion_constante(self, valor):
-        if isinstance(valor, int):
-            pass
-        elif isinstance(valor, bool):
-            pass
-        elif isinstance(valor, float):
-            pass
-        elif isinstance(valor, str):
-            pass
 
     def get_temporal(self):
         """Para saber en qué temporal voy"""
@@ -326,37 +318,51 @@ class GeneracionCuadruplos:
 
         atomo = atomo.children[0]
         if isinstance(atomo, Token):
+            print("TOKEN!", atomo, atomo.type)
             if atomo.type == "CTEI":
+                print("INT")
                 if int(atomo) in self.diccionarioConstates:
                     return self.diccionarioConstates[int(atomo)]
                 else:
                     direccion = "00" + \
                         str(self.contadorConstantes["int"]).zfill(3)
                     self.contadorConstantes["int"] += 1
+
+                    self.diccionarioConstates[int(atomo)] = direccion
+
                     return direccion
             elif atomo.type == "CTEF":
-                if int(atomo) in self.diccionarioConstates:
+
+                if float(atomo) in self.diccionarioConstates:
                     return self.diccionarioConstates[float(atomo)]
                 else:
                     direccion = "01" + \
                         str(self.contadorConstantes["float"]).zfill(3)
                     self.contadorConstantes["float"] += 1
+
+                    self.diccionarioConstates[float(atomo)] = direccion
                     return direccion
             elif atomo.type == "CTESTR":
-                if int(atomo) in self.diccionarioConstates:
+                if str(atomo) in self.diccionarioConstates:
                     return self.diccionarioConstates[str(atomo)]
                 else:
                     direccion = "02" + \
                         str(self.contadorConstantes["str"]).zfill(3)
                     self.contadorConstantes["str"] += 1
+                    self.diccionarioConstates[str(atomo)] = direccion
+
                     return direccion
             elif atomo.type == "CTEBOOL":
-                if int(atomo) in self.diccionarioConstates:
-                    return self.diccionarioConstates[bool(atomo)]
+                valor = atomo.value == 'True'
+                if valor in self.diccionarioConstates:
+                    return self.diccionarioConstates[valor]
                 else:
                     direccion = "03" + \
                         str(self.contadorConstantes["bool"]).zfill(3)
                     self.contadorConstantes["bool"] += 1
+
+                    self.diccionarioConstates[valor] = direccion
+
                     return direccion
         else:  # Es un arbol, no token.
             # print("atomo child:", atomo.pretty())
@@ -577,6 +583,11 @@ class GeneracionCuadruplos:
         lista_string_cuadruplos = [str(cuadruplo)
                                    for cuadruplo in self.listaCuadruplos
                                    ]
+
+        # 1 insert - tabla constantes
+
+        lista_string_cuadruplos.append(repr(self.diccionarioConstates))
+
         return lista_string_cuadruplos
 
 

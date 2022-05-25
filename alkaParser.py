@@ -34,6 +34,7 @@ ALKA_parser = Lark(
     CTEI :  /[0-9]+/
     CTEF : /[0-9]+\.[0-9]+/
     CTESTR : /\"([^\\\n]|(\\.))*?\"/
+    CTEBOOL : "True" | "False"
     COLON : ":"
     VAR : "var"
     IF : "if"

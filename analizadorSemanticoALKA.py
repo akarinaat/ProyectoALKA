@@ -1,6 +1,5 @@
 from ctypes import Union
 from typing import Dict, List
-from xmlrpc.client import Boolean
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
 from dataclasses import dataclass
@@ -252,7 +251,7 @@ class AnalizadorSemantico:
                 # Checar que la función esté declarada
                 # Que tiene la cantidad correcta de argumentos
                 # Checar que los argumentos tengan el tipo correcto
-                pass
+                return self.analizar_llamadafuncion(atomo)
             elif atomo.data == "funcionesespeciales":
                 # Checar que se llame con el tipo correcto
                 pass
