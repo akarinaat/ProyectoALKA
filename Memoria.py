@@ -13,8 +13,7 @@ class Memoria:
         self.direccion_base_str = self.direccion_base_bool + self.rango_espacios
         self.direccion_base_temporales = self.direccion_base_str + self.rango_espacios
 
-        self.espacio_variables_unidimensionales = []
-        self.espacio_variables_arreglo = []
+        self.espacio_variables = []
 
         self.direcciones_base = {
             "int": self.direccion_base_ints,

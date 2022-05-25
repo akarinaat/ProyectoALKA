@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, auto
+from functools import reduce
 from typing import Any, Dict, List
 from Memoria import Memoria
 from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
@@ -87,7 +88,7 @@ class GeneracionCuadruplos:
 
     def generar_cuadruplo_nuevo(self, operacion: Operaciones, operando_izq: str, operando_der: str, direccion: str = None):
         if direccion is None:
-            temporal_actual = "t" + str(self.get_temporal())
+            temporal_actual = "2" + str(self.get_temporal()).zfill(4)
             cuadruplo = Cuadruplo(operacion, operando_izq,
                                   operando_der, temporal_actual)
             self.listaCuadruplos.append(cuadruplo)
@@ -153,7 +154,6 @@ class GeneracionCuadruplos:
 
         self.generar_cuadruplo_nuevo("ERA", nombre_funcion, "", "")
 
-        print(self.diccionarioFunciones)
         # conseguir la direccin de la funcion, lo hago con el nombre de la misma
         direccion_funcion = self.diccionarioFunciones[nombre_funcion]
 
@@ -362,9 +362,17 @@ class GeneracionCuadruplos:
         tipo = decvar.children[0].children[0]
 
         variables = decvar.children[1:]
+
         for variable in variables:
 
             nombre = variable.children[0].children[0]
+            lista_CTEIs_dimensiones: List[Token] = variable.children[1:]
+            tamano = [1] if len(
+                lista_CTEIs_dimensiones) == 0 else [int(str(dim)) for dim in lista_CTEIs_dimensiones]
+
+            tamano = reduce(lambda x, y: x*y, tamano, 1)
+            print(tamano)
+            cantidad_expresiones = len(lista_CTEIs_dimensiones)
 
             # Conseguir la direccion de la variable
             direccion_variable = 0
@@ -372,18 +380,23 @@ class GeneracionCuadruplos:
 
                 # Direccion base del tipo, mas cuantos de ese tipo hay
                 direccion_variable = self.memoria_global.direcciones_base[tipo] + \
-                    self.memoria_global.contadores_tipo_unidimensional[tipo]
+                    self.memoria_global.contadores_tipo_variables[tipo]
+
+                direccion_variable = str(direccion_variable).zfill(4)
                 # incrementar el contador de variables de su tipo.
-                self.memoria_global.contadores_tipo_unidimensional[tipo] += 1
+                self.memoria_global.contadores_tipo_variables[tipo] += tamano
                 # Prefijo variables globales es "1"
                 self.directorio_variables_globales[nombre] = "1" + \
                     str(direccion_variable)
             elif alcance == Alcance.alcance_local:
-                print(self.memoria_stack)
+
                 direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
                     self.memoria_stack[-1].contadores_tipo_variables[tipo]
+
+                direccion_variable = str(direccion_variable).zfill(4)
+
                 # incrementar el contador de variables de su tipo.
-                self.memoria_stack[-1].contadores_tipo_variables[tipo] += 1
+                self.memoria_stack[-1].contadores_tipo_variables[tipo] += tamano
                 # Prefijo variables locales es "2"
                 self.directorio_variables_locales[-1][nombre] = "2" + \
                     str(direccion_variable)
@@ -391,16 +404,13 @@ class GeneracionCuadruplos:
             else:
                 raise SemanticError("Error al compilar, alcance no definido")
 
-            lista_expresiones_dimensiones = variable.children[1:]
-            cantidad_expresiones = len(lista_expresiones_dimensiones)
-
             # generar los cuádruplos de las expresiones de las dimensiones
-            temporales_dimensiones = [
-                self.generar_cuadruplos_expresion(expresion)
-                for expresion in lista_expresiones_dimensiones
-            ]
+            # temporales_dimensiones = [
+            #     self.generar_cuadruplos_expresion(expresion)
+            #     for expresion in lista_CTEIs_dimensiones
+            # ]
 
-            dimensiones_str = str(temporales_dimensiones)
+            # dimensiones_str = str(temporales_dimensiones)
             # self.generar_cuadruplo_nuevo(
             #     "decvar", tipo, dimensiones_str, str(nombre))
 

@@ -128,3 +128,16 @@ def test_decfunc():
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
     assert len(generador.listaCuadruplos) == 4
+
+
+def test_decvar_memoria_arreglo():
+    programa = """ 
+    var int:a[3][2];
+    main(){
+        
+    }"""
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos_programa()
+    assert len(generador.listaCuadruplos) == 0
+    assert generador.memoria_global.contadores_tipo_variables["int"] == 6
+    assert generador.directorio_variables_globales["a"] == '10000'

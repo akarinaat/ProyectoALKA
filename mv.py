@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import sys
 from Cuadruplos import Cuadruplo
+from Memoria import Memoria
 
 
 class MaquinaVirtual:
@@ -15,12 +16,14 @@ class MaquinaVirtual:
 # osea de tipos
 # local temporal etc
         self.memoria_parametros = []
-        self.memoria_temporales = []
         self.memoria_funciones = []
 
         self.pila_brincos_endFunc = []
 
         self.instruccion_actual = 0
+
+        self.memoria_global = Memoria()
+        self.memoria_stack: list[Memoria] = [Memoria()]
 
         self.ejecutar_programa()
 
