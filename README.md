@@ -161,5 +161,24 @@ Fecha de entrega Mayo 8 2022
 
 Fecha de entrega: Mayo 16 2022
 
+## Sexta entrega
+
+- Cambié nombres de funciones por direcciones
+- Arreglé análisis semántico para estatuto return dentro funciones y estatutos de control
+- Generé cuádruplos return
+- Generé cuadruplo ERA (no al 100% pero si lo genera)
+- Arreglé el stack en generación de código (le agregué stack de variables locales para el main)
+- Cambié gramatica de decvar, le quite llamada variable y agregué iddecvar que tiene una CTEI en vez de expresion
+- Arreglé direcciones virtuales globales
+- Ya puedo pedir memoria de arreglos
+- **Mapa de memoria en ejecución ya funciona**
+
+Falta: Ejecución de Expresiones y Estatutos Secuenciales.
+       Temporales
+
+Fecha de entrega: Mayo 24 2022
+
+
+
 
 
