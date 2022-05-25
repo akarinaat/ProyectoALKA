@@ -1,5 +1,6 @@
 from ctypes import Union
 from typing import Dict, List
+from xmlrpc.client import Boolean
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
 from dataclasses import dataclass
@@ -239,6 +240,8 @@ class AnalizadorSemantico:
                 return Tipo.Float
             elif atomo.type == "CTESTR":
                 return Tipo.String
+            elif atomo.type == "CTEBOOL":
+                return Tipo.Bool
         else:
             if atomo.data == "llamadavariable":
                # print(atomo.pretty())

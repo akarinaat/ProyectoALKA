@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+from operator import indexOf
 import sys
-from Cuadruplos import Cuadruplo
+from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
 
 
@@ -42,6 +43,20 @@ class MaquinaVirtual:
                 pass
 
             self.instruccion_actual += 1
+    
+    def obtener_valor(self, direccion):
+        #Encontrar en qué memoria está (local global)
+        prefijo = direccion[0]
+        if prefijo == 0:
+            alcance = Alcance.alcance_constante
+        elif prefijo  == 1:
+            alcance = Alcance.alcance_global
+        elif prefijo == 2:
+            alcance = Alcance.alcance_local
+        
+
+    def guardar_valor(self,valor,direccion_dondeguardarlo):
+        pass
 
 
 if __name__ == "__main__":

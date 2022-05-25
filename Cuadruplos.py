@@ -16,6 +16,7 @@ Operaciones = dict(zip(string_ops, range(len(string_ops))))
 class Alcance(Enum):
     alcance_global = auto()
     alcance_local = auto()
+    alcance_constante = auto()
 
 
 @dataclass
@@ -54,6 +55,14 @@ class GeneracionCuadruplos:
         # Directorio de funciones:
         self.diccionarioFunciones: Dict[str,
                                         Funcion] = {}  # tipos parametricos
+
+        self.diccionarioConstates = {}
+        self.contadorConstantes = {
+            "int": 0,
+            "float": 0,
+            "str": 0,
+            "bool": 0
+        }
         # Lista de variables de funciones
         self.programa = programa
         self.temporal_actual = 0
@@ -79,6 +88,16 @@ class GeneracionCuadruplos:
 
         # Para saber direcciones / cantidades variables locales
         self.memoria_stack: List[Memoria] = [Memoria()]
+
+    def direccion_constante(self, valor):
+        if isinstance(valor, int):
+            pass
+        elif isinstance(valor, bool):
+            pass
+        elif isinstance(valor, float):
+            pass
+        elif isinstance(valor, str):
+            pass
 
     def get_temporal(self):
         """Para saber en qué temporal voy"""
@@ -236,7 +255,6 @@ class GeneracionCuadruplos:
 
 ############### EXPRESION ##################
 
-
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
 
@@ -309,11 +327,37 @@ class GeneracionCuadruplos:
         atomo = atomo.children[0]
         if isinstance(atomo, Token):
             if atomo.type == "CTEI":
-                return int(atomo)
+                if int(atomo) in self.diccionarioConstates:
+                    return self.diccionarioConstates[int(atomo)]
+                else:
+                    direccion = "00" + \
+                        str(self.contadorConstantes["int"]).zfill(3)
+                    self.contadorConstantes["int"] += 1
+                    return direccion
             elif atomo.type == "CTEF":
-                return float(atomo)
+                if int(atomo) in self.diccionarioConstates:
+                    return self.diccionarioConstates[float(atomo)]
+                else:
+                    direccion = "01" + \
+                        str(self.contadorConstantes["float"]).zfill(3)
+                    self.contadorConstantes["float"] += 1
+                    return direccion
             elif atomo.type == "CTESTR":
-                return atomo
+                if int(atomo) in self.diccionarioConstates:
+                    return self.diccionarioConstates[str(atomo)]
+                else:
+                    direccion = "02" + \
+                        str(self.contadorConstantes["str"]).zfill(3)
+                    self.contadorConstantes["str"] += 1
+                    return direccion
+            elif atomo.type == "CTEBOOL":
+                if int(atomo) in self.diccionarioConstates:
+                    return self.diccionarioConstates[bool(atomo)]
+                else:
+                    direccion = "03" + \
+                        str(self.contadorConstantes["bool"]).zfill(3)
+                    self.contadorConstantes["bool"] += 1
+                    return direccion
         else:  # Es un arbol, no token.
             # print("atomo child:", atomo.pretty())
 
