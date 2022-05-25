@@ -165,6 +165,7 @@ Fecha de entrega: Mayo 16 2022
 
 - Cambié nombres de funciones por direcciones
 - Arreglé análisis semántico para estatuto return dentro funciones y estatutos de control
+- Agregué mapa de memoria y máquina virtual
 - Generé cuádruplos return
 - Generé cuadruplo ERA (no al 100% pero si lo genera)
 - Arreglé el stack en generación de código (le agregué stack de variables locales para el main)
