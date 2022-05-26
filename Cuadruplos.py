@@ -1,7 +1,8 @@
+from audioop import reverse
 from dataclasses import dataclass
 from enum import Enum, auto
 from functools import reduce
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from Memoria import Memoria
 from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
 from lark import Token, Tree
@@ -71,11 +72,13 @@ class GeneracionCuadruplos:
 
         # Esta es para pasar de los nombres a direcciones
         # recibe un str y nos regresa un int (la dirección)
-        self.directorio_variables_globales: Dict[str, int] = {}
+        self.directorio_variables_globales: Dict[str, Tuple[int, List[int]]] = {
+        }
 
         # Cuando se llama una funcion, se mete un directorio nuevo
         # Cuando termina la funcion, se saca un directorio
-        self.directorio_variables_locales: List[Dict[str, int]] = [{}]
+        self.directorio_variables_locales: List[Dict[str, Tuple[int, List[int]]]] = [
+            {}]
 
         # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
         self.analizador = AnalizadorSemantico(programa)
@@ -89,7 +92,6 @@ class GeneracionCuadruplos:
 
         # Para saber direcciones / cantidades variables locales
         self.memoria_stack: List[Memoria] = [Memoria()]
-
 
     def get_temporal(self):
         """Para saber en qué temporal voy"""
@@ -395,10 +397,74 @@ class GeneracionCuadruplos:
 
 ############### LLAMADAVARIABLE #######################
    # llamadavariable : id ("[" expresion "]" )*
-    def generar_cuadruplos_llamadavariable(self, llamadavariable: Tree):
-        id_var = llamadavariable.children[0].children[0]
-        print(id_var, "el nombre de llamada variable")
-        return id_var
+    def generar_cuadruplos_llamadavariable(self, arbol_llamadavariable: Tree):
+
+        id_var = arbol_llamadavariable.children[0].children[0]
+        if id_var in self.directorio_variables_locales[-1]:
+            direccion_variable, lista_dimensiones = self.directorio_variables_locales[-1][id_var]
+        elif id_var in self.directorio_variables_globales:
+            direccion_variable, lista_dimensiones = self.directorio_variables_globales[id_var]
+        else:
+            raise SemanticError("Error al compilar")
+
+        if len(lista_dimensiones) == 0:
+            return direccion_variable
+
+        # guardo direccion como constante
+
+        direccion_constante_base = self.obtener_direccion_constante(
+            direccion_variable)
+
+        # M empieza en uno, porque empiezo por la ultima dimension
+        direccion_m_inicial = self.obtener_direccion_constante(1)
+        direccion_m_temporal = self.generar_cuadruplo_nuevo(
+            "=", direccion_m_inicial, "")
+
+        direccion_indice_inicial = self.obtener_direccion_constante(0)
+        direccion_indice_final_temporal = self.generar_cuadruplo_nuevo(
+            "=", direccion_indice_inicial, "")
+
+        lista_arboles_expresiones = arbol_llamadavariable.children[1:]
+
+        for expresion_index, dimension in reversed(zip(lista_arboles_expresiones, lista_dimensiones)):
+            direccion_indice_temporal = self.generar_cuadruplos_expresion(
+                expresion_index)
+
+            direccion_dimension_constante = self.obtener_direccion_constante(
+                dimension)
+
+            # calcular posicion indice
+
+            aux1 = self.generar_cuadruplo_nuevo(
+                "*", direccion_m_temporal, direccion_indice_temporal
+            )
+
+            self.generar_cuadruplo_nuevo(
+                "+", direccion_indice_final_temporal, aux1, direccion_indice_final_temporal)
+
+            # calcular M
+            self.generar_cuadruplo_nuevo(
+                "*", direccion_m_temporal, direccion_dimension_constante, direccion_m_temporal)
+
+            self.generar_cuadruplo_nuevo(
+                "ver", direccion_indice_temporal, dimension, "")
+        # print(id_var, "el nombre de llamada variable")
+
+        # agregar el indice a la direccion base
+        return self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal)
+
+    def obtener_direccion_constante(self, constante: str):
+        if int(constante) in self.diccionarioConstates:
+            return self.diccionarioConstates[int(
+                constante)]
+        else:
+            direccion = "00" + \
+                str(self.contadorConstantes["int"]).zfill(3)
+            self.contadorConstantes["int"] += 1
+
+            self.diccionarioConstates[int(constante)] = direccion
+
+            return direccion
 
     def generar_cuadruplos_decvars(self, decvars: Tree, alcance: Alcance):
 
@@ -417,10 +483,10 @@ class GeneracionCuadruplos:
 
             nombre = variable.children[0].children[0]
             lista_CTEIs_dimensiones: List[Token] = variable.children[1:]
-            tamano = [1] if len(
+            lista_dimensiones = [1] if len(
                 lista_CTEIs_dimensiones) == 0 else [int(str(dim)) for dim in lista_CTEIs_dimensiones]
 
-            tamano = reduce(lambda x, y: x*y, tamano, 1)
+            tamano = reduce(lambda x, y: x*y, lista_dimensiones, 1)
             print(tamano)
             cantidad_expresiones = len(lista_CTEIs_dimensiones)
 
@@ -436,8 +502,8 @@ class GeneracionCuadruplos:
                 # incrementar el contador de variables de su tipo.
                 self.memoria_global.contadores_tipo_variables[tipo] += tamano
                 # Prefijo variables globales es "1"
-                self.directorio_variables_globales[nombre] = "1" + \
-                    str(direccion_variable)
+                self.directorio_variables_globales[nombre] = ("1" +
+                                                              str(direccion_variable), lista_dimensiones)
             elif alcance == Alcance.alcance_local:
 
                 direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
@@ -448,8 +514,8 @@ class GeneracionCuadruplos:
                 # incrementar el contador de variables de su tipo.
                 self.memoria_stack[-1].contadores_tipo_variables[tipo] += tamano
                 # Prefijo variables locales es "2"
-                self.directorio_variables_locales[-1][nombre] = "2" + \
-                    str(direccion_variable)
+                self.directorio_variables_locales[-1][nombre] = ("2" +
+                                                                 str(direccion_variable), lista_dimensiones)
 
             else:
                 raise SemanticError("Error al compilar, alcance no definido")
