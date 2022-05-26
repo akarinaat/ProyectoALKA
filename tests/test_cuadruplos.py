@@ -38,7 +38,7 @@ def test_expresion_llamada_var():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     assert len(generador.listaCuadruplos) == 2
-    assert generador.listaCuadruplos[1].op1 == "b"
+    assert generador.listaCuadruplos[1].op1 == "21000"
 
 
 def test_if():
@@ -148,10 +148,25 @@ def test_varcall_memoria_arreglo():
     programa = """ 
     var int:a[3][2];
     main(){
-        a[2][3];
+        a[2][3] + 5;
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 1
+    print(generador.listaCuadruplos)
+    assert len(generador.listaCuadruplos) == 13
     assert generador.memoria_global.contadores_tipo_variables["int"] == 6
+    assert generador.directorio_variables_globales["a"][0] == '10000'
+
+
+def test_varcall_memoria_arreglo2():
+    programa = """ 
+    var int:a[3][2][3];
+    main(){
+        a[2][3][0] + 5;
+    }"""
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos_programa()
+    print(generador.listaCuadruplos)
+    assert len(generador.listaCuadruplos) == 17
+    assert generador.memoria_global.contadores_tipo_variables["int"] == 18
     assert generador.directorio_variables_globales["a"][0] == '10000'

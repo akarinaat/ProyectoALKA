@@ -125,7 +125,9 @@ class GeneracionCuadruplos:
                 pass
 
     def generar_cuadruplos_main(self, subtree: Tree):
+        posicion_main = len(self.listaCuadruplos)
 
+        self.listaCuadruplos[0].op1 = posicion_main
         for child in subtree.children:
 
             if child.data == "decvars":
@@ -249,6 +251,7 @@ class GeneracionCuadruplos:
 
 ############### EXPRESION ##################
 
+
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
 
@@ -370,7 +373,7 @@ class GeneracionCuadruplos:
             # print("atomo child:", atomo.pretty())
 
             if atomo.data == 'llamadavariable':
-                return atomo.children[0].children[0]
+                return self.generar_cuadruplos_llamadavariable(atomo)
                 # Como se ponen las variables con dimensiones en cuadruplos?
                 # A[2+f(3)][3] + 3;
                 # lo que regresa generar cuadruplos llamvar : "(a,[2,3])"
