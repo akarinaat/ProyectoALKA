@@ -7,7 +7,7 @@ def test_prueba_basica():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 2
+    assert len(generador.listaCuadruplos) == 3
 
 
 def test_prueba_asignacion():
@@ -17,7 +17,8 @@ def test_prueba_asignacion():
                 } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 1
+    print(generador.hacer_string_cuadruplos())
+    assert len(generador.listaCuadruplos) == 2
 
 
 def test_prueba_decvar():
@@ -26,7 +27,7 @@ def test_prueba_decvar():
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 0
+    assert len(generador.listaCuadruplos) == 1
 
 
 def test_expresion_llamada_var():
@@ -36,8 +37,8 @@ def test_expresion_llamada_var():
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 1
-    assert generador.listaCuadruplos[0].op1 == "b"
+    assert len(generador.listaCuadruplos) == 2
+    assert generador.listaCuadruplos[1].op1 == "b"
 
 
 def test_if():
@@ -57,7 +58,7 @@ def test_if():
     } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 4
+    assert len(generador.listaCuadruplos) == 5
 
 
 def test_while():
@@ -69,7 +70,7 @@ def test_while():
     } """
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 4
+    assert len(generador.listaCuadruplos) == 5
 
 
 def test_for():
@@ -100,7 +101,7 @@ def test_for():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 7
+    assert len(generador.listaCuadruplos) == 8
 
 
 def test_llamadafuncion():
@@ -127,7 +128,7 @@ def test_decfunc():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 4
+    assert len(generador.listaCuadruplos) == 5
 
 
 def test_decvar_memoria_arreglo():
@@ -138,6 +139,19 @@ def test_decvar_memoria_arreglo():
     }"""
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
-    assert len(generador.listaCuadruplos) == 0
+    assert len(generador.listaCuadruplos) == 1
     assert generador.memoria_global.contadores_tipo_variables["int"] == 6
-    assert generador.directorio_variables_globales["a"] == '10000'
+    assert generador.directorio_variables_globales["a"][0] == '10000'
+
+
+def test_varcall_memoria_arreglo():
+    programa = """ 
+    var int:a[3][2];
+    main(){
+        a[2][3];
+    }"""
+    generador = GeneracionCuadruplos(programa)
+    generador.generar_cuadruplos_programa()
+    assert len(generador.listaCuadruplos) == 1
+    assert generador.memoria_global.contadores_tipo_variables["int"] == 6
+    assert generador.directorio_variables_globales["a"][0] == '10000'

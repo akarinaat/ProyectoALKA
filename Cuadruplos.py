@@ -407,6 +407,7 @@ class GeneracionCuadruplos:
         else:
             raise SemanticError("Error al compilar")
 
+        # checar si es valor unidimensional
         if len(lista_dimensiones) == 0:
             return direccion_variable
 
@@ -426,7 +427,7 @@ class GeneracionCuadruplos:
 
         lista_arboles_expresiones = arbol_llamadavariable.children[1:]
 
-        for expresion_index, dimension in reversed(zip(lista_arboles_expresiones, lista_dimensiones)):
+        for expresion_index, dimension in reversed(list(zip(lista_arboles_expresiones, lista_dimensiones))):
             direccion_indice_temporal = self.generar_cuadruplos_expresion(
                 expresion_index)
 
@@ -483,7 +484,7 @@ class GeneracionCuadruplos:
 
             nombre = variable.children[0].children[0]
             lista_CTEIs_dimensiones: List[Token] = variable.children[1:]
-            lista_dimensiones = [1] if len(
+            lista_dimensiones = [] if len(
                 lista_CTEIs_dimensiones) == 0 else [int(str(dim)) for dim in lista_CTEIs_dimensiones]
 
             tamano = reduce(lambda x, y: x*y, lista_dimensiones, 1)
