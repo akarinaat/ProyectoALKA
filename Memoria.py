@@ -14,7 +14,7 @@ class Memoria:
 
         self.tamano_seccion = self.direccion_base_str+self.rango_espacios
 
-        self.espacio = []
+        self.espacio_memoria = []
 
         self.direcciones_base = {
             "int": self.direccion_base_ints,
