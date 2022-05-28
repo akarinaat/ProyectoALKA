@@ -11,6 +11,7 @@ programa = """
             True;
             False;
             "hola mundo";
+            return 3;
         }"""
 
 generador = GeneracionCuadruplos(programa)

@@ -1,6 +1,6 @@
 # Para saber cuántos de cada un voy a tener
 from dataclasses import dataclass
-
+import numpy as np
 
 class Memoria:
 
@@ -14,7 +14,7 @@ class Memoria:
 
         self.tamano_seccion = self.direccion_base_str+self.rango_espacios
 
-        self.espacio_memoria = []
+        self.espacio_memoria = np.empty(20000)
 
         self.direcciones_base = {
             "int": self.direccion_base_ints,

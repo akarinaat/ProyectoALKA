@@ -3,6 +3,7 @@ from operator import indexOf
 import sys
 from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
+import numpy as np
 
 
 class MaquinaVirtual:
@@ -16,21 +17,27 @@ class MaquinaVirtual:
 
 # osea de tipos
 # local temporal etc
-        self.memoria_parametros = []
-        self.memoria_funciones = []
+        self.memoria_constantes = np.empty(5000)
+
+        self.stack_direcciones_return = []
 
         self.pila_brincos_endFunc = []
 
         self.instruccion_actual = 0
 
         self.memoria_global = Memoria()
-        self.memoria_stack: list[Memoria] = [Memoria()]
+        self.memoria_stack: list[Memoria] = [
+            Memoria()]  # La memoria inicial es del main
+
+        diccionario_consts = eval(self.lista_cuadruplos.pop())
+        for key, value in diccionario_consts.items():
+            self.memoria_constantes[int(value)] = key
 
         self.ejecutar_programa()
 
     def ejecutar_programa(self):
-        while(self.instruccion_actual < len(self.lista_cuadruplos)):
-            cuadruplo_actual_split = self.lista_cuadruplos[self.instruccion_actual].split(
+        while(int(self.instruccion_actual) < len(self.lista_cuadruplos)):
+            cuadruplo_actual_split = self.lista_cuadruplos[int(self.instruccion_actual)].split(
                 ",")
 
             # Del string de cuadruplos voy sacando el str de cada uno
@@ -85,26 +92,58 @@ class MaquinaVirtual:
                     raise RuntimeError(
                         f"Index out of bounds! index is {indice}, limit is {limite}")
             elif operacion == "goto":
-                self.instruccion_actual = direccion
+                self.instruccion_actual = int(op1)
             elif operacion == "gotof":
                 condicion = self.obtener_valor(op1)
                 if condicion is False:
-                    self.instruccion_actual = direccion
+                    self.instruccion_actual = int(direccion)
 
+            elif operacion == "gosub":
+                # Me regreso a donde estaba antes de que se ejecutara la funcion
+                self.pila_brincos_endFunc.append(self.instruccion_actual)
+
+                self.memoria_stack.append(Memoria())
+
+                self.instruccion_actual = int(op1)
+                cantidad_parametros = op2
+
+                direccion_resultado = direccion
+
+                self.stack_direcciones_return.append(direccion_resultado)
+
+            elif operacion == "return":
+                resultado = self.obtener_valor(direccion)
+                
+                # Checar si es el  del main
+                if len(self.stack_direcciones_return) == 0:
+                    # Imprimir resultado a consola
+                    print(resultado)
+                    return resultado
+
+                donde_guardar_resultado = self.stack_direcciones_return.pop()
+
+                self.guardar_valor(resultado, donde_guardar_resultado)
+                # borrar la memoria local a la funcion
+                self.memoria_stack.pop()
+
+                
+
+                # regresar a la instruccion despues del gosub
+                self.instruccion_actual = self.pila_brincos_endFunc.pop()
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)
         prefijo = direccion[0]
         # Acceder a lo qu eno es el prefijo
         direccion = direccion[1:]
-        if prefijo == 0:
-            pass
-        elif prefijo == 1:
-            pass
+        if prefijo == '0':
+            return self.memoria_constantes[int(direccion)]
+        elif prefijo == '1':
+
             # Regresa el valor que está en esta direccin en la memoria global
             return self.memoria_global.espacio_memoria[int(direccion)]
 
-        elif prefijo == 2:
+        elif prefijo == '2':
             # Regresa
             return self.memoria_stack[-1].espacio_memoria[int(direccion)]
 
@@ -113,18 +152,19 @@ class MaquinaVirtual:
         prefijo = direccion_index[0]
         # Acceder a lo qu eno es el prefijo
         direccion_index = direccion_index[1:]
-        if prefijo == 0:
+        if prefijo == '0':
             pass
-        elif prefijo == 1:
+        elif prefijo == '1':
             # Regresa el valor que está en esta direccin en la memoria global
             self.memoria_global.espacio_memoria[int(
                 direccion_index)] = valor
 
-        elif prefijo == 2:
+        elif prefijo == '2':
             # Regresa
             self.memoria_stack[-1].espacio_memoria[int(
                 direccion_index)] = valor
 
 
 if __name__ == "__main__":
-    MaquinaVirtual(sys.argv[1])
+    # MaquinaVirtual(sys.argv[1])
+    MaquinaVirtual("test.out")

@@ -9,7 +9,7 @@ from lark import Token, Tree
 import sys
 
 
-string_ops = "* / + - decfunc decvar < > != = param goto gotof call".split()
+string_ops = "* / + - decfunc decvar < > != = param goto gotof gosub".split()
 Operaciones = dict(zip(string_ops, range(len(string_ops))))
 # {'*': 0, '/': 1, '+': 2, '-': 3, 'decfunc': 4, 'decvar': 5, '<': 6, '>': 7, '!=': 8, '=': 9, 'param': 10, 'goto': 11, 'gotof': 12, 'call': 13}
 
@@ -199,7 +199,7 @@ class GeneracionCuadruplos:
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "call", direccion_funcion, len(lista_resultados_expresiones))  # antes estaba el nombre
+            "gosub", direccion_funcion, len(lista_resultados_expresiones))  # antes estaba el nombre
         # nombre_funcion
         return direccion_resultado_llamada
 
@@ -245,7 +245,7 @@ class GeneracionCuadruplos:
     # return : "return" expresion
     def generar_cuadruplos_return(self, arbol_return: Tree):
         direccion_valor_return = self.generar_cuadruplos_expresion(
-            arbol_return)
+            arbol_return.children[0])
         self.generar_cuadruplo_nuevo("return", "", "", direccion_valor_return)
 
 
@@ -665,9 +665,11 @@ if __name__ == "__main__":
 
     # Voy a leer el archivo que contiene el código fuente
     # ArchivoIn tiene el string de lo que es el programa (tipo el string que hay en las pruebas, not exactly but like that)
-    archivoIn = sys.argv[1]
+    # archivoIn = sys.argv[1]
+    archivoIn ="test.alka"
     # Es el que contiene el código intermedio
-    archivoOut = sys.argv[2]
+    # archivoOut = sys.argv[2]
+    archivoOut = "test.out"
     # Abre y cierra sin el close
     with open(archivoIn, "r") as codigo:
         generador = GeneracionCuadruplos(codigo.read())

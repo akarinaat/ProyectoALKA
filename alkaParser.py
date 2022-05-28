@@ -116,6 +116,16 @@ ALKA_parser = Lark(
 
     funcionesespeciales : "read" | "write" | "hist" | "mean" | "mode" | "avg" | "variance"
 
+    hist : "hist" "(" llamadavariable ")"
+
+    mean: "mean" "(" llamadavariable ")"
+
+    mode: "mode" "(" llamadavariable  ")"
+
+    avg: "avg" "(" llamadavariable ")"
+
+    variance: "variance" "(" llamadavariable ")"
+
 
 
     ''',
