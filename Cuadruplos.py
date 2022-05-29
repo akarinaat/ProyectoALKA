@@ -263,7 +263,7 @@ class GeneracionCuadruplos:
         self.generar_cuadruplos_decvars(
             arbol_decvars, Alcance.alcance_local)  # dentro de funcion es local
 
-        self.generar_cuadruplos_estatutos(arbol_estatutos)
+       
 
 
         # generar el objeto de la funcion
@@ -273,6 +273,8 @@ class GeneracionCuadruplos:
 
         # meter funcion a diccionario funciones
         self.diccionarioFunciones[nombre_decfunc] = funcion
+
+        self.generar_cuadruplos_estatutos(arbol_estatutos)
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
 
