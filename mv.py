@@ -5,8 +5,14 @@ from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
 import numpy as np
 
+# Ejecucion
+
 
 class MaquinaVirtual:
+
+    # La máquina virtual empieza a leer el archivo con
+    # el código intermedio (cuádruplos) generados en compilación
+    # Le llega el nombre del archivo
     def __init__(self, archivo_cuadruplos) -> None:
         cuadruplos = ""
 
@@ -18,16 +24,15 @@ class MaquinaVirtual:
 # osea de tipos
 # local temporal etc
         self.memoria_constantes = np.empty(5000)
-
         self.stack_direcciones_return = []
-
         self.pila_brincos_endFunc = []
-
         self.instruccion_actual = 0
 
         self.memoria_global = Memoria()
         self.memoria_stack: list[Memoria] = [
             Memoria()]  # La memoria inicial es del main
+
+        self.memoria_funcion_a_llamar: Memoria = None
 
         diccionario_consts = eval(self.lista_cuadruplos.pop())
         for key, value in diccionario_consts.items():
@@ -102,7 +107,7 @@ class MaquinaVirtual:
                 # Me regreso a donde estaba antes de que se ejecutara la funcion
                 self.pila_brincos_endFunc.append(self.instruccion_actual)
 
-                self.memoria_stack.append(Memoria())
+                self.memoria_stack.append(self.memoria_funcion_a_llamar)
 
                 self.instruccion_actual = int(op1)
                 cantidad_parametros = op2
@@ -113,7 +118,7 @@ class MaquinaVirtual:
 
             elif operacion == "return":
                 resultado = self.obtener_valor(direccion)
-                
+
                 # Checar si es el  del main
                 if len(self.stack_direcciones_return) == 0:
                     # Imprimir resultado a consola
@@ -125,11 +130,10 @@ class MaquinaVirtual:
                 self.guardar_valor(resultado, donde_guardar_resultado)
                 # borrar la memoria local a la funcion
                 self.memoria_stack.pop()
-
-                
-
                 # regresar a la instruccion despues del gosub
                 self.instruccion_actual = self.pila_brincos_endFunc.pop()
+
+            elif operacion == "ERA":
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)

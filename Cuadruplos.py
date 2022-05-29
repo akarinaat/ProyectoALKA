@@ -40,6 +40,8 @@ class Funcion:
     tamaño: int
     nombre: str
     direccion_inicio: int
+    directorio_variables: dict[str, str]
+    lista_nombres_parametros: list[str]
 
 
 class GeneracionCuadruplos:
@@ -77,6 +79,8 @@ class GeneracionCuadruplos:
 
         # Cuando se llama una funcion, se mete un directorio nuevo
         # Cuando termina la funcion, se saca un directorio
+        # le das el nombre de una variable, y te regresa su ( direccion , lista dimensiones)
+        # Cuando se llama una funcion, se agrega un directorio nuevo
         self.directorio_variables_locales: List[Dict[str, Tuple[int, List[int]]]] = [
             {}]
 
@@ -164,13 +168,18 @@ class GeneracionCuadruplos:
 
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
     def generar_cuadruplos_llamadafuncion(self, arbol_llamadafuncion: Tree):
+
+        # LLAMADA FUNCION SOLO ACEPTA VALORES UNIDIMENSIONALES - AUN NO ARREGLOS
+
         nombre_funcion = arbol_llamadafuncion.children[0].children[0]
-        lista_expresion_llamadafuncion = arbol_llamadafuncion.children[1:]
+        lista_expresiones_argumentos = arbol_llamadafuncion.children[1:]
 
         self.generar_cuadruplo_nuevo("ERA", nombre_funcion, "", "")
 
         # conseguir la direccin de la funcion, lo hago con el nombre de la misma
-        direccion_funcion = self.diccionarioFunciones[nombre_funcion]
+        funcion_actual = self.diccionarioFunciones[nombre_funcion]
+
+        direccion_funcion = funcion_actual.direccion_inicio
 
         # foo(2+3,a*5)
         # + 2 3 t0
@@ -186,21 +195,35 @@ class GeneracionCuadruplos:
         #     lista_resultados_expresiones.append(res)
 
         # 1. Conseguir la dirección de los resultados de los argumentos
+        # func(2+3,5)
+        # + 2 3 t1
+        # t1 --> La direccion de este temporal es el que estoy consiguiedo
 
         lista_resultados_expresiones = [
             self.generar_cuadruplos_expresion(expresion)
-            for expresion in lista_expresion_llamadafuncion
+            for expresion in lista_expresiones_argumentos
         ]
 
-        # 2.  Declarar los argumentos
-        for (index, resultado) in enumerate(lista_resultados_expresiones):
+        # 2.  Meter el argumento en el espacio del parametro
+        #
+        for (index, direccion_resultado_argumento) in enumerate(lista_resultados_expresiones):
+
+            # Tengo que definir la direccion virtual del parametro
+
+            # agarro el nombre del parametro correspondiente, y consigo su direccion virtual
+            # le digo a la mv, que guarde el valor del argumento (resultado), en la direccion (espacio) del parametro
+            nombre_parametro = funcion_actual.lista_nombres_parametros[index]
+
+            direccion_parametro = funcion_actual.directorio_variables[nombre_parametro]
+
             self.generar_cuadruplo_nuevo(
-                "param", "", resultado, "p"+str(index))
+                "param", direccion_resultado_argumento, "", direccion_parametro)
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "gosub", direccion_funcion, len(lista_resultados_expresiones))  # antes estaba el nombre
-        # nombre_funcion
+            "gosub", direccion_funcion,"")  # antes estaba el nombre
+       
+        # rergresar el valor que regresa la funcion
         return direccion_resultado_llamada
 
     # decfunc : "func" tipo id  "(" parameters ")"  "{" decvars estatutos "}"
@@ -224,23 +247,45 @@ class GeneracionCuadruplos:
         # Para saber en qué cuadruplo voy
         posicion_inicio = len(self.listaCuadruplos)
 
-        # Meter func en directorio funciones
+        self.directorio_variables_locales.append({})
+        self.memoria_stack.append(Memoria())
 
-        self.diccionarioFunciones[nombre_decfunc] = posicion_inicio
+        # Asignar espacio a parametros
+        lista_nombres_parametros = self.asignar_espacio_parametros(
+            arbol_parametros)
 
-        self.generar_cuadruplos_parametros(arbol_parametros)
+        
+
+        # librar memoria del stack
+
+        self.memoria_stack.pop()
+
         self.generar_cuadruplos_decvars(
             arbol_decvars, Alcance.alcance_local)  # dentro de funcion es local
+
         self.generar_cuadruplos_estatutos(arbol_estatutos)
+
+
+        # generar el objeto de la funcion
+
+        funcion = Funcion(0, nombre_decfunc, posicion_inicio,
+                          self.directorio_variables_locales.pop(), lista_nombres_parametros)
+
+        # meter funcion a diccionario funciones
+        self.diccionarioFunciones[nombre_decfunc] = funcion
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
 
-    def generar_cuadruplos_parametros(self, arbol_parametros: Tree):
+
+    def asignar_espacio_parametros(self, arbol_parametros: Tree) -> list[str]:
+        lista_nombres = []
         for parametro in arbol_parametros.children:
-            nombre_parametro = parametro.children[0].children[0]
+            nombre_parametro = str(parametro.children[0].children[0])
+            lista_nombres.append(nombre_parametro)
             tipo_parametro = parametro.children[1].children[0]
-            self.generar_cuadruplo_nuevo(
-                "decvar", tipo_parametro, "", nombre_parametro)
+            self.declarar_variable_local(
+                tipo_parametro, 1, nombre_parametro, [])
+        return lista_nombres
 
     # return : "return" expresion
     def generar_cuadruplos_return(self, arbol_return: Tree):
@@ -373,7 +418,9 @@ class GeneracionCuadruplos:
             # print("atomo child:", atomo.pretty())
 
             if atomo.data == 'llamadavariable':
-                return self.generar_cuadruplos_llamadavariable(atomo)
+                direccion, lista_dims = self.generar_cuadruplos_llamadavariable(
+                    atomo)
+                return direccion
                 # Como se ponen las variables con dimensiones en cuadruplos?
                 # A[2+f(3)][3] + 3;
                 # lo que regresa generar cuadruplos llamvar : "(a,[2,3])"
@@ -394,9 +441,11 @@ class GeneracionCuadruplos:
         arbol_expresion = asignacion.children[1]
         valor_expresion = self.generar_cuadruplos_expresion(arbol_expresion)
         # Generar llamada variable
-        variable = self.generar_cuadruplos_llamadavariable(llamada_var_asig)
-        self.generar_cuadruplo_nuevo("=", valor_expresion, "", variable)
-        return variable
+        direccion_variable, lista_dims = self.generar_cuadruplos_llamadavariable(
+            llamada_var_asig)
+        self.generar_cuadruplo_nuevo(
+            "=", valor_expresion, "", direccion_variable)
+        return direccion_variable
 
 ############### LLAMADAVARIABLE #######################
    # llamadavariable : id ("[" expresion "]" )*
@@ -412,7 +461,7 @@ class GeneracionCuadruplos:
 
         # checar si es valor unidimensional
         if len(lista_dimensiones) == 0:
-            return direccion_variable
+            return direccion_variable, []
 
         # guardo direccion como constante
 
@@ -455,7 +504,7 @@ class GeneracionCuadruplos:
         # print(id_var, "el nombre de llamada variable")
 
         # agregar el indice a la direccion base
-        return self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal)
+        return self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal), lista_dimensiones
 
     def obtener_direccion_constante(self, constante: str):
         if int(constante) in self.diccionarioConstates:
@@ -510,16 +559,8 @@ class GeneracionCuadruplos:
                                                               str(direccion_variable), lista_dimensiones)
             elif alcance == Alcance.alcance_local:
 
-                direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
-                    self.memoria_stack[-1].contadores_tipo_variables[tipo]
-
-                direccion_variable = str(direccion_variable).zfill(4)
-
-                # incrementar el contador de variables de su tipo.
-                self.memoria_stack[-1].contadores_tipo_variables[tipo] += tamano
-                # Prefijo variables locales es "2"
-                self.directorio_variables_locales[-1][nombre] = ("2" +
-                                                                 str(direccion_variable), lista_dimensiones)
+                self.declarar_variable_local(
+                    tipo, tamano, nombre, lista_dimensiones)
 
             else:
                 raise SemanticError("Error al compilar, alcance no definido")
@@ -535,6 +576,18 @@ class GeneracionCuadruplos:
             #     "decvar", tipo, dimensiones_str, str(nombre))
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
+
+    def declarar_variable_local(self, tipo, tamano, nombre, lista_dimensiones):
+        direccion_variable = self.memoria_stack[-1].direcciones_base[tipo] + \
+            self.memoria_stack[-1].contadores_tipo_variables[tipo]
+
+        direccion_variable = str(direccion_variable).zfill(4)
+
+        # incrementar el contador de variables de su tipo.
+        self.memoria_stack[-1].contadores_tipo_variables[tipo] += tamano
+        # Prefijo variables locales es "2"
+        self.directorio_variables_locales[-1][nombre] = ("2" +
+                                                         str(direccion_variable), lista_dimensiones)
 
     def generar_cuadruplos_while(self, arbol_while: Tree):
         arbol_expresion_while = arbol_while.children[0]
@@ -666,7 +719,7 @@ if __name__ == "__main__":
     # Voy a leer el archivo que contiene el código fuente
     # ArchivoIn tiene el string de lo que es el programa (tipo el string que hay en las pruebas, not exactly but like that)
     # archivoIn = sys.argv[1]
-    archivoIn ="test.alka"
+    archivoIn = "test.alka"
     # Es el que contiene el código intermedio
     # archivoOut = sys.argv[2]
     archivoOut = "test.out"

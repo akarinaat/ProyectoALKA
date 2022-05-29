@@ -1,3 +1,10 @@
+func b(){
+}
+
+func a(){
+    b()
+}
+
 main(){
     var float: b;
     var int : a,c,d,f;

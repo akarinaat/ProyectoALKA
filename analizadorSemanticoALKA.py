@@ -192,7 +192,9 @@ class AnalizadorSemantico:
 
         if len(expresion.children) == 1:
             exp = expresion.children[0]
-            return self.analizar_exp(exp)
+            tipo =  self.analizar_exp(exp)
+            expresion.tipo = tipo
+            return tipo
             # si es una comoparación
         elif len(expresion.children) == 3:
             exp1 = expresion.children[0]
@@ -201,6 +203,7 @@ class AnalizadorSemantico:
             tipo_exp2 = self.analizar_exp(exp2)
 
             if tipo_exp1 == tipo_exp2:
+                expresion.tipo = Tipo.Bool
                 return Tipo.Bool
                 # return Tipo("bool")
             else:
