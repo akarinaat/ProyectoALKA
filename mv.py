@@ -134,6 +134,7 @@ class MaquinaVirtual:
                 self.instruccion_actual = self.pila_brincos_endFunc.pop()
 
             elif operacion == "ERA":
+                self.memoria_funcion_a_llamar = Memoria()
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)
