@@ -274,6 +274,11 @@ class GeneracionCuadruplos:
         # meter funcion a diccionario funciones
         self.diccionarioFunciones[nombre_decfunc] = funcion
 
+
+        # como se generan los cuadruplos de los estatutos
+        # despues de meter la funcion al diccionario funciones
+        # funciona la recursividad. 
+        # (Esta declarada la funcion cuando se ejecutan sus estatutos)
         self.generar_cuadruplos_estatutos(arbol_estatutos)
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
