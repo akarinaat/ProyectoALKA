@@ -134,8 +134,13 @@ class MaquinaVirtual:
                 self.instruccion_actual = self.pila_brincos_endFunc.pop()
 
             elif operacion == "ERA":
-                #Se ejecuta el cuadruplo ERA y se aparta la memoria
+                # Se ejecuta el cuadruplo ERA y se aparta la memoria
                 self.memoria_funcion_a_llamar = Memoria()
+
+            elif operacion == "param":
+                argumento = self.obtener_valor(op1)
+
+                self.memoria_funcion_a_llamar.espacio_memoria[direccion] = argumento
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)
