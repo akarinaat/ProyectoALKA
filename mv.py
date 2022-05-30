@@ -127,9 +127,11 @@ class MaquinaVirtual:
 
                 donde_guardar_resultado = self.stack_direcciones_return.pop()
 
-                self.guardar_valor(resultado, donde_guardar_resultado)
                 # borrar la memoria local a la funcion
                 self.memoria_stack.pop()
+
+                # Guardar valor en el que llamo
+                self.guardar_valor(resultado, donde_guardar_resultado)
                 # regresar a la instruccion despues del gosub
                 self.instruccion_actual = self.pila_brincos_endFunc.pop()
 
@@ -138,9 +140,9 @@ class MaquinaVirtual:
                 self.memoria_funcion_a_llamar = Memoria()
 
             elif operacion == "param":
-                argumento = self.obtener_valor(op1)
+                valor_argumento = self.obtener_valor(op1)
 
-                self.memoria_funcion_a_llamar.espacio_memoria[direccion] = argumento
+                self.memoria_funcion_a_llamar.espacio_memoria[int(direccion[1:])] = valor_argumento
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)

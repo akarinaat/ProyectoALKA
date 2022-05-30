@@ -128,7 +128,7 @@ def test_decfunc():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 5
+    assert len(generador.listaCuadruplos) == 3
 
 
 def test_decvar_memoria_arreglo():

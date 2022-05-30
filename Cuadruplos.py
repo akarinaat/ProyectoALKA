@@ -40,7 +40,8 @@ class Funcion:
     tamaño: int
     nombre: str
     direccion_inicio: int
-    directorio_variables: dict[str, str]
+    # El directorio de variables 
+    directorio_variables: dict[str, Tuple[str, List[int]]]
     lista_nombres_parametros: list[str]
 
 
@@ -217,12 +218,12 @@ class GeneracionCuadruplos:
             direccion_parametro = funcion_actual.directorio_variables[nombre_parametro]
 
             self.generar_cuadruplo_nuevo(
-                "param", direccion_resultado_argumento, "", direccion_parametro)
+                "param", direccion_resultado_argumento, "", direccion_parametro[0])
 
         # 3. Generar el cuadruplo llamada funcion
         direccion_resultado_llamada = self.generar_cuadruplo_nuevo(
-            "gosub", direccion_funcion,"")  # antes estaba el nombre
-       
+            "gosub", direccion_funcion, "")  # antes estaba el nombre
+
         # rergresar el valor que regresa la funcion
         return direccion_resultado_llamada
 
@@ -254,8 +255,6 @@ class GeneracionCuadruplos:
         lista_nombres_parametros = self.asignar_espacio_parametros(
             arbol_parametros)
 
-        
-
         # librar memoria del stack
 
         self.memoria_stack.pop()
@@ -263,26 +262,23 @@ class GeneracionCuadruplos:
         self.generar_cuadruplos_decvars(
             arbol_decvars, Alcance.alcance_local)  # dentro de funcion es local
 
-       
-
-
         # generar el objeto de la funcion
 
         funcion = Funcion(0, nombre_decfunc, posicion_inicio,
-                          self.directorio_variables_locales.pop(), lista_nombres_parametros)
+                          self.directorio_variables_locales[-1].copy(), lista_nombres_parametros)
 
         # meter funcion a diccionario funciones
         self.diccionarioFunciones[nombre_decfunc] = funcion
 
-
         # como se generan los cuadruplos de los estatutos
         # despues de meter la funcion al diccionario funciones
-        # funciona la recursividad. 
+        # funciona la recursividad.
         # (Esta declarada la funcion cuando se ejecutan sus estatutos)
         self.generar_cuadruplos_estatutos(arbol_estatutos)
 
-        self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
+        self.directorio_variables_locales.pop()
 
+        self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
 
     def asignar_espacio_parametros(self, arbol_parametros: Tree) -> list[str]:
         lista_nombres = []
@@ -302,7 +298,6 @@ class GeneracionCuadruplos:
 
 
 ############### EXPRESION ##################
-
 
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión

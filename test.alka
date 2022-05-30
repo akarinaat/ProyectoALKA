@@ -1,15 +1,9 @@
-func b(){
-}
 
-func a(){
-    b()
+func int a( b int,c int,t int){
+   return b + 3;
 }
 
 main(){
-    var float: b;
-    var int : a,c,d,f;
-    b = 3.1;
-    b+3.2;
-    b * 1235.2;
-    return 3;
+    return a(2);
 }
+
