@@ -185,7 +185,7 @@ class AnalizadorSemantico:
 
         tipo_llamada_variable = self.analizar_llamadavariable(
             arbol_llamada_variable)
-        tipo_expresion = self.analizar_expresion(arbol_expresion)
+        tipo_expresion = self.checar_void(self.analizar_expresion(arbol_expresion))
 
         # Comparar los tipos
         if tipo_llamada_variable != tipo_expresion:
@@ -205,8 +205,8 @@ class AnalizadorSemantico:
         elif len(expresion.children) == 3:
             exp1 = expresion.children[0]
             exp2 = expresion.children[2]
-            tipo_exp1 = self.analizar_exp(exp1)
-            tipo_exp2 = self.analizar_exp(exp2)
+            tipo_exp1 = self.checar_void(self.analizar_exp(exp1))
+            tipo_exp2 = self.checar_void(self.analizar_exp(exp2))
 
             if tipo_exp1 == tipo_exp2:
                 expresion.tipo = Tipo.Bool
@@ -233,7 +233,7 @@ class AnalizadorSemantico:
                 return self.analizar_atomo(expresion)
         elif len(factor.children) == 2:
             atomo = factor.children[1]
-            return self.analizar_atomo(atomo)
+            return self.checar_void(self.analizar_atomo(atomo))
 
         else:
             raise SemanticError("Factor mal formado")
@@ -262,9 +262,8 @@ class AnalizadorSemantico:
                 # Checar que los argumentos tengan el tipo correcto
                 return self.analizar_llamadafuncion(atomo)
             elif atomo.data == "funcionesespeciales":
-                # Checar que se llame con el tipo correcto  
+                # Checar que se llame con el tipo correcto
                 return self.analizar_funcionesespeciales(atomo)
-                
 
     def analizar_llamadavariable(self, arbol_llamada_variable: Tree) -> Tipo:
         nombre_variable = str(arbol_llamada_variable.children[0].children[0])
@@ -307,7 +306,7 @@ class AnalizadorSemantico:
 
         # 3. Checar que los argumentos sean del tipo correcto
         for (argumento, tipo_parametro) in zip(lista_de_arboles_argumentos, funcion_declarada.parametros):
-            tipo_argumento = self.analizar_expresion(argumento)
+            tipo_argumento = self.checar_void(self.analizar_expresion(argumento))
             if tipo_argumento != tipo_parametro:
                 raise SemanticError(
                     f"Tipos no on iguales: {tipo_argumento} != {tipo_parametro}")
@@ -319,7 +318,7 @@ class AnalizadorSemantico:
         tipo = funcion(lista_operandos[0])
         # para que no se cheque el primero dos veces
         for operando in lista_operandos[1:]:
-            if funcion(operando) != tipo:
+            if self.checar_void(funcion(operando)) != tipo:
                 raise SemanticError("Tipos incompatibles")
 
         return tipo
@@ -349,7 +348,7 @@ class AnalizadorSemantico:
     def analizar_return(self, arbol_return: Tree) -> List[Tipo]:
         expresion = arbol_return.children[0]
         # Regresa un tipo
-        return [self.analizar_expresion(expresion)]
+        return [self.checar_void(self.analizar_expresion(expresion))]
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
     def analizar_while(self, arbol_while: Tree) -> List[Tipo]:
@@ -381,46 +380,60 @@ class AnalizadorSemantico:
 
         return self.analizar_estatutos(arbol_estaturos_for.children)
 
-    def analizar_funcionesespeciales(self, arbol_funcionesespeciales: Tree)->Tipo:
+    def analizar_funcionesespeciales(self, arbol_funcionesespeciales: Tree) -> Tipo:
         #funcionesespeciales : read | write | hist | mean | mode | avg | variance | print
 
         if arbol_funcionesespeciales.children[0].data == "read":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0])
-            
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0])
+
         elif arbol_funcionesespeciales.children[0].data == "write":
             self.analizar_write(arbol_funcionesespeciales.children[0])
 
         elif arbol_funcionesespeciales.children[0].data == "hist":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0], True)
 
         elif arbol_funcionesespeciales.children[0].data == "mean":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0], True)
 
         elif arbol_funcionesespeciales.children[0].data == "mode":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0], True)
 
         elif arbol_funcionesespeciales.children[0].data == "avg":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0], True)
 
         elif arbol_funcionesespeciales.children[0].data == "variance":
-            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+            self.analizar_funcion_especial(
+                arbol_funcionesespeciales.children[0], True)
 
         return Tipo.Void
 
     def analizar_write(self, arbol_print: Tree):
 
         for expresion in arbol_print.children:
-         self.analizar_expresion(expresion)
-    
-    def analizar_funcion_especial(self, arbol_funcEsp: Tree, isNum = False):
+            self.analizar_expresion(expresion)
 
-        
-        arbol_llamada_variable = arbol_funcEsp.children[0]  
-        tipo_llamada_variable = self.analizar_llamadavariable(arbol_llamada_variable)
+    def analizar_funcion_especial(self, arbol_funcEsp: Tree, isNum=False):
+
+        arbol_llamada_variable = arbol_funcEsp.children[0]
+        tipo_llamada_variable = self.analizar_llamadavariable(
+            arbol_llamada_variable)
 
         if isNum:
             if tipo_llamada_variable != Tipo.Int and tipo_llamada_variable != Tipo.Float:
-                raise SemanticError("Esta función especial no se puede llamar con una variable NO numérica")
+                raise SemanticError(
+                    "Esta función especial no se puede llamar con una variable NO numérica")
+
+    def checar_void(self, tipo):
+
+        if tipo == Tipo.Void:
+            raise SemanticError(
+                "No se puede completar una operación con tipo void")
+        return tipo
 
 
 def get_token(subtree: Tree, token_type: str):
