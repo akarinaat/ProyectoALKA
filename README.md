@@ -179,6 +179,34 @@ Falta: Ejecución de Expresiones y Estatutos Secuenciales.
 
 Fecha de entrega: Mayo 24 2022
 
+## Séptima entrega
+
+- Agregué el goto a main en cuádruplos
+- Agregué el diccionario de constantes
+- CTEBOOL al parser
+- Generation de direcciones de constantes
+- Mapa de memoria en ejecución completo
+- Mapa de memoria constantes
+- Generación de cuádruplos de acceso a arreglos :)
+- Pruebas de acceso arreglo pasaron
+- Generar mapa de memoria temporales
+
+Primera versión
+- Estatutos secuenciales en la MV listo
+- Estatutos condicionales en la MV listo
+- Métodos de acceso y guardado de direcciones virtuales
+
+Falta hacer pruebas 
+
+- Agregué funciones a la máquina virtual
+- Arreglé el manejo de memoria para los parámetros llamada función
+- AGREGUÉ RECURSIVIDAD
+- Agregué ejecución de cuádruplos param a MV
+- Arreglé funciones y el return en máquina virtual
+
+### Además del avance técnico, empecé la documentación del proyecto final
+
+Fecha de entrega: Mayo 30 2022
 
 
 
