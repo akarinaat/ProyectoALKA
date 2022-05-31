@@ -21,8 +21,6 @@ class MaquinaVirtual:
 
         self.lista_cuadruplos = cuadruplos.split("\n")
 
-# osea de tipos
-# local temporal etc
         self.memoria_constantes = np.empty(5000)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
@@ -100,7 +98,7 @@ class MaquinaVirtual:
                 self.instruccion_actual = int(op1)
             elif operacion == "gotof":
                 condicion = self.obtener_valor(op1)
-                if condicion is False:
+                if condicion == False:
                     self.instruccion_actual = int(direccion)
 
             elif operacion == "gosub":
@@ -142,7 +140,8 @@ class MaquinaVirtual:
             elif operacion == "param":
                 valor_argumento = self.obtener_valor(op1)
 
-                self.memoria_funcion_a_llamar.espacio_memoria[int(direccion[1:])] = valor_argumento
+                self.memoria_funcion_a_llamar.espacio_memoria[int(
+                    direccion[1:])] = valor_argumento
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)

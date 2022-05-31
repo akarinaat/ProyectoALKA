@@ -1,9 +1,18 @@
 
-func int a( b int,c int,t int){
+func int a( b int){
    return b + 3;
 }
 
+func int factorial(f int){
+     
+     if (f == 0){
+         return 1;
+     } else {
+         return f * factorial(f-1);
+     };
+}
+
 main(){
-    return a(2);
+    return factorial(5);
 }
 

@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 import numpy as np
 
+
 class Memoria:
 
     def __init__(self) -> None:
@@ -14,7 +15,7 @@ class Memoria:
 
         self.tamano_seccion = self.direccion_base_str+self.rango_espacios
 
-        self.espacio_memoria = np.empty(20000)
+        self.espacio_memoria = np.empty(20000, dtype=object)
 
         self.direcciones_base = {
             "int": self.direccion_base_ints,

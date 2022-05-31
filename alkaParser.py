@@ -46,6 +46,7 @@ ALKA_parser = Lark(
     WHILE : "while"
     STRING : "string"
     BOOL : "bool"
+    VOID : "void"
     READ : "read"
     HIST : "hist"
     MODE : "mode"
@@ -108,7 +109,7 @@ ALKA_parser = Lark(
 
     llamadavariable : id ("[" expresion "]" )*
 
-    tipo : INT | STRING | FLOAT | BOOL
+    tipo : INT | STRING | FLOAT | BOOL | VOID
 
     read : "read" "(" llamadavariable ")"
 

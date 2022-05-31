@@ -370,9 +370,9 @@ class GeneracionCuadruplos:
 
         atomo = atomo.children[0]
         if isinstance(atomo, Token):
-            print("TOKEN!", atomo, atomo.type)
+            # print("TOKEN!", atomo, atomo.type)
             if atomo.type == "CTEI":
-                print("INT")
+                #print("INT")
                 if int(atomo) in self.diccionarioConstates:
                     return self.diccionarioConstates[int(atomo)]
                 else:

@@ -15,6 +15,7 @@ class Tipo(Enum):
     Int = "int"
     String = "string"
     Bool = "bool"
+    Void = "void"
 
 
 @dataclass  # son para guardar información
@@ -88,6 +89,9 @@ class AnalizadorSemantico:
             self.declarar_variable(nombre, Tipo(tipo), len_dimensiones)
 
     def declarar_variable(self, nombre, tipo: Tipo, dimensiones: int):
+
+        if tipo == Tipo.Void:
+            raise SemanticError("Una variable no puede ser void")
         # checar si ya existe la variable en la lista de directorios
         for directorio in self.directoriosVariables:
             if nombre in directorio:
@@ -120,8 +124,14 @@ class AnalizadorSemantico:
         for decvar in decvars.children:
             self.analizar_decvar(decvar)
 
+        self.directorioFunciones[nombre] = Funcion(
+            tipo, nombre, lista_parametros)
+
         # analizar el cuerpo de la función
         lista_tipos_return = self.analizar_estatutos(estatutos)
+
+        if tipo == Tipo.Void and len(lista_tipos_return) != 0:
+            raise SemanticError("Una funcion void no puede regresar nada")
 
         for tipo_return in lista_tipos_return:
             if tipo_return != tipo:
@@ -131,8 +141,6 @@ class AnalizadorSemantico:
         # las borro, por eso el pop
         self.directoriosVariables.pop()
 
-        self.directorioFunciones[nombre] = Funcion(
-            tipo, nombre, lista_parametros)
 
 ######################### ANALIZAR ESTATUTOS #######################
 # A cada función de analizar le llega el arbol que le corresponde
@@ -192,7 +200,7 @@ class AnalizadorSemantico:
 
         if len(expresion.children) == 1:
             exp = expresion.children[0]
-            tipo =  self.analizar_exp(exp)
+            tipo = self.analizar_exp(exp)
             expresion.tipo = tipo
             return tipo
             # si es una comoparación
