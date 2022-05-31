@@ -166,6 +166,7 @@ class GeneracionCuadruplos:
 
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
+            
 
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
     def generar_cuadruplos_llamadafuncion(self, arbol_llamadafuncion: Tree):
@@ -714,6 +715,10 @@ class GeneracionCuadruplos:
         lista_string_cuadruplos.append(repr(self.diccionarioConstates))
 
         return lista_string_cuadruplos
+
+
+#######   FUNCIONES ESPECIALES #####
+
 
 
 if __name__ == "__main__":

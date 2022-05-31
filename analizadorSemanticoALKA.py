@@ -1,4 +1,5 @@
 from ctypes import Union
+from pickle import FALSE
 from typing import Dict, List
 from alkaparser import ALKA_parser
 from lark import Token, Tree, tree
@@ -155,7 +156,7 @@ class AnalizadorSemantico:
         return results
 
     def analizar_estatuto(self, estatuto: Tree):
-        # (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";"
+        # (asignacion | expresion | if | while | forloop | return) ";"
         # El unico que regresa un valor es el return
 
         if estatuto.children[0].data == "expresion":
@@ -163,9 +164,6 @@ class AnalizadorSemantico:
 
         elif estatuto.children[0].data == "asignacion":
             self.analizar_asignacion(estatuto.children[0])
-
-        elif estatuto.children[0].data == "llamadafuncion":
-            self.analizar_llamadafuncion(estatuto.children[0])
 
         elif estatuto.children[0].data == "if":
             return self.analizar_if(estatuto.children[0])
@@ -264,8 +262,9 @@ class AnalizadorSemantico:
                 # Checar que los argumentos tengan el tipo correcto
                 return self.analizar_llamadafuncion(atomo)
             elif atomo.data == "funcionesespeciales":
-                # Checar que se llame con el tipo correcto
-                pass
+                # Checar que se llame con el tipo correcto  
+                return self.analizar_funcionesespeciales(atomo)
+                
 
     def analizar_llamadavariable(self, arbol_llamada_variable: Tree) -> Tipo:
         nombre_variable = str(arbol_llamada_variable.children[0].children[0])
@@ -381,6 +380,47 @@ class AnalizadorSemantico:
             raise SemanticError("Variable tiene que ser entero")
 
         return self.analizar_estatutos(arbol_estaturos_for.children)
+
+    def analizar_funcionesespeciales(self, arbol_funcionesespeciales: Tree)->Tipo:
+        #funcionesespeciales : read | write | hist | mean | mode | avg | variance | print
+
+        if arbol_funcionesespeciales.children[0].data == "read":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0])
+            
+        elif arbol_funcionesespeciales.children[0].data == "write":
+            self.analizar_write(arbol_funcionesespeciales.children[0])
+
+        elif arbol_funcionesespeciales.children[0].data == "hist":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+
+        elif arbol_funcionesespeciales.children[0].data == "mean":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+
+        elif arbol_funcionesespeciales.children[0].data == "mode":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+
+        elif arbol_funcionesespeciales.children[0].data == "avg":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+
+        elif arbol_funcionesespeciales.children[0].data == "variance":
+            self.analizar_funcion_especial(arbol_funcionesespeciales.children[0], True)
+
+        return Tipo.Void
+
+    def analizar_write(self, arbol_print: Tree):
+
+        for expresion in arbol_print.children:
+         self.analizar_expresion(expresion)
+    
+    def analizar_funcion_especial(self, arbol_funcEsp: Tree, isNum = False):
+
+        
+        arbol_llamada_variable = arbol_funcEsp.children[0]  
+        tipo_llamada_variable = self.analizar_llamadavariable(arbol_llamada_variable)
+
+        if isNum:
+            if tipo_llamada_variable != Tipo.Int and tipo_llamada_variable != Tipo.Float:
+                raise SemanticError("Esta función especial no se puede llamar con una variable NO numérica")
 
 
 def get_token(subtree: Tree, token_type: str):

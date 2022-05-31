@@ -40,7 +40,6 @@ ALKA_parser = Lark(
     IF : "if"
     FLOAT : "float"
     INT : "int"
-    PRINT : "print"
     ELSE : "else"
     TO : "to"
     WHILE : "while"
@@ -58,6 +57,7 @@ ALKA_parser = Lark(
     FUNC : "func"
     FOR : "for"
     MAIN : "main"
+   
 
     id : ID
 
@@ -91,7 +91,7 @@ ALKA_parser = Lark(
 
     estatutos : estatuto*
 
-    estatuto : (asignacion | llamadafuncion | expresion | if | while | forloop | return) ";" 
+    estatuto : (asignacion | expresion | if | while | forloop | return) ";" 
 
     return : "return" expresion
 
@@ -103,7 +103,7 @@ ALKA_parser = Lark(
 
     factor : "(" expresion ")" | (PLUS | MINUS)? atomo
 
-    atomo : llamadavariable | CTEF | CTESTR | CTEI | CTEBOOL | llamadafuncion | funcionesespeciales
+    atomo : llamadavariable | CTEF | CTESTR | CTEI | CTEBOOL | funcionesespeciales | llamadafuncion 
 
     llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
@@ -115,7 +115,7 @@ ALKA_parser = Lark(
 
     write : "write" "(" expresion ( "," expresion )* ")"
 
-    funcionesespeciales : "read" | "write" | "hist" | "mean" | "mode" | "avg" | "variance"
+    funcionesespeciales : read | write | hist | mean | mode | avg | variance
 
     hist : "hist" "(" llamadavariable ")"
 

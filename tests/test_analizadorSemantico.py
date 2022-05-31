@@ -213,3 +213,14 @@ def test_llamadafuncion():
     analizador.analizarArbol()
     print(analizador.directoriosVariables)
 
+def test_print():
+    programa = """
+    
+    main(){
+    write(3);    
+    }"""
+    analizador = AnalizadorSemantico(programa)
+    analizador.analizarArbol()
+    print(analizador.directoriosVariables)
+    assert 1 == 2
+
