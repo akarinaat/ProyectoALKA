@@ -1,15 +1,6 @@
 
-func int factorial(f int){
-     
-     if (f == 0){
-         return 1;
-     } else {
-         return f * factorial(f-1);
-     };
-}
 
 main(){
-
-    return factorial(5);
+    write("Mi primer Hello World con ALKA");
 }
 

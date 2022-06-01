@@ -21,7 +21,7 @@ class MaquinaVirtual:
 
         self.lista_cuadruplos = cuadruplos.split("\n")
 
-        self.memoria_constantes = np.empty(5000)
+        self.memoria_constantes = np.empty(5000,dtype=object)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
         self.memoria_parametros_es = []
