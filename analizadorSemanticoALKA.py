@@ -148,6 +148,7 @@ class AnalizadorSemantico:
 # Se asigna una a variable al valor de los nodos
 #    Se analizan los valores
 
+
     def analizar_estatutos(self, estatutos: List[Tree]) -> List[Tipo]:
         results: List[Tipo] = []
         for estatuto in estatutos:
@@ -176,10 +177,6 @@ class AnalizadorSemantico:
 
         elif estatuto.children[0].data == "while":
             return self.analizar_while(estatuto.children[0])
-
-        elif estatuto.children[0].data == "funcionesespeciales":
-            # Checar que se llame con el tipo correcto
-            self.analizar_funcionesespeciales(estatuto.children[0])
 
     def analizar_asignacion(self, arbol_asignacion: Tree) -> Tipo:
         # llamadavariable "=" expresion
@@ -260,6 +257,9 @@ class AnalizadorSemantico:
                # print(atomo.pretty())
                 return self.analizar_llamadavariable(atomo)
                 # que efectivamente si tenga las 2 dimensiones
+            elif atomo.data == "funcionesespeciales":
+                # Checar que se llame con el tipo correcto
+                return self.analizar_funcionesespeciales(atomo)
 
             elif atomo.data == "llamadafuncion":
                 # Checar que la función esté declarada
@@ -389,31 +389,32 @@ class AnalizadorSemantico:
         if arbol_funcionesespeciales.children[0].data == "read":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0])
+            return Tipo.Void
 
         elif arbol_funcionesespeciales.children[0].data == "write":
             self.analizar_write(arbol_funcionesespeciales.children[0])
+            return Tipo.Void
 
         elif arbol_funcionesespeciales.children[0].data == "hist":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0], True)
+            return Tipo.Void
 
         elif arbol_funcionesespeciales.children[0].data == "mean":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0], True)
+            return Tipo.Float
 
         elif arbol_funcionesespeciales.children[0].data == "mode":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0], True)
+            return Tipo.Float
 
-        elif arbol_funcionesespeciales.children[0].data == "avg":
-            self.analizar_funcion_especial(
-                arbol_funcionesespeciales.children[0], True)
 
         elif arbol_funcionesespeciales.children[0].data == "variance":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0], True)
-
-        return Tipo.Void
+            return Tipo.Float
 
     def analizar_write(self, arbol_print: Tree):
 
