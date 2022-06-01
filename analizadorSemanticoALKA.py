@@ -415,7 +415,6 @@ class AnalizadorSemantico:
                 arbol_funcionesespeciales.children[0], True)
             return Tipo.Float
 
-
         elif arbol_funcionesespeciales.children[0].data == "variance":
             self.analizar_funcion_especial(
                 arbol_funcionesespeciales.children[0], True)

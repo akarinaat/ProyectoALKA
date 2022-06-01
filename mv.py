@@ -171,6 +171,10 @@ class MaquinaVirtual:
 
 
     def guardar_valor(self, valor, direccion_index):
+
+
+        if int(direccion_index) < 0:
+            raise RuntimeError ("No se puede: Error de segmentación :'(")
        # Encontrar en qué memoria está (local global)
         prefijo = direccion_index[0]
         # Acceder a lo qu eno es el prefijo

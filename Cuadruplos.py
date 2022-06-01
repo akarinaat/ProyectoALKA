@@ -169,8 +169,6 @@ class GeneracionCuadruplos:
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
 
-            
-
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
     def generar_cuadruplos_llamadafuncion(self, arbol_llamadafuncion: Tree):
@@ -513,6 +511,8 @@ class GeneracionCuadruplos:
         # print(id_var, "el nombre de llamada variable")
 
         # agregar el indice a la direccion base
+        # regresa dirección y lista de dimensiones
+        ######## PARA PASAR ARREGLOS A FUNCIONES ESPECIALES ###############
         return self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal), lista_dimensiones
 
     def obtener_direccion_constante(self, constante: str):
@@ -726,8 +726,8 @@ class GeneracionCuadruplos:
 #######   FUNCIONES ESPECIALES #####
 
 
-    def generar_cuadruplos_funciones_especiales(self, arbol_funcs: Tree):
-        funcEsp = arbol_funcs.children[0]
+    def generar_cuadruplos_funciones_especiales(self, arbol_funcs_especiales: Tree):
+        funcEsp = arbol_funcs_especiales.children[0]
         if funcEsp.data == "write":
             expresiones = funcEsp.children
 
@@ -736,16 +736,28 @@ class GeneracionCuadruplos:
                     expresion)
                 self.generar_cuadruplo_nuevo(
                     "write", direccion_resultado, "", "")
-            return -1 #-1 para decir que es dirección void
+            return -1  # -1 para decir que es dirección void
         elif funcEsp.data == "read":
-            llamada_variable = arbol_funcs.children[0] #llamadavariable
+            # llamadavariable , ya es el read
+            llamada_variable = arbol_funcs_especiales.children[0]
+            # direccion y dimensiones de esa llamada variable
+            direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
+                llamada_variable)
+
+            for dim in lista_dims_args_funcesp:
+                self.generar_cuadruplo_nuevo(
+                    "DIM", self.obtener_direccion_constante(str(dim)), "", "")
             
+            self.generar_cuadruplo_nuevo("read",direccion_argumento,"","")
+
+            return -1 #porque es void :)
+
         else:
             self.generar_cuadruplo_funcion_especial(
                 funcEsp.children[0], funcEsp.data)
 
-    #  nombre "(" llamadavariable ")"
 
+    #  nombre "(" llamadavariable ")"
     def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
         arbol_llamada_variable = arbol_funcesp.children[0]
 
