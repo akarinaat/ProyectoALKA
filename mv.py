@@ -24,6 +24,7 @@ class MaquinaVirtual:
         self.memoria_constantes = np.empty(5000)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
+        self.memoria_parametros_es = []
         self.instruccion_actual = 0
 
         self.memoria_global = Memoria()
@@ -136,12 +137,18 @@ class MaquinaVirtual:
             elif operacion == "ERA":
                 # Se ejecuta el cuadruplo ERA y se aparta la memoria
                 self.memoria_funcion_a_llamar = Memoria()
-
+                self.memoria_parametros_es = []
             elif operacion == "param":
                 valor_argumento = self.obtener_valor(op1)
 
                 self.memoria_funcion_a_llamar.espacio_memoria[int(
                     direccion[1:])] = valor_argumento
+
+            elif operacion == "parames":
+                valor_argumento = self.obtener_valor(op1)
+                self.memoria_parametros_es.append(valor_argumento)
+            elif operacion == "write":
+                print(self.obtener_valor(op1))
 
     def obtener_valor(self, direccion: str):
         # Encontrar en qué memoria está (local global)

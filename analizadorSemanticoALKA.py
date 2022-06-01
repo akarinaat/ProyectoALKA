@@ -177,6 +177,10 @@ class AnalizadorSemantico:
         elif estatuto.children[0].data == "while":
             return self.analizar_while(estatuto.children[0])
 
+        elif estatuto.children[0].data == "funcionesespeciales":
+            # Checar que se llame con el tipo correcto
+            self.analizar_funcionesespeciales(estatuto.children[0])
+
     def analizar_asignacion(self, arbol_asignacion: Tree) -> Tipo:
         # llamadavariable "=" expresion
 
@@ -185,7 +189,8 @@ class AnalizadorSemantico:
 
         tipo_llamada_variable = self.analizar_llamadavariable(
             arbol_llamada_variable)
-        tipo_expresion = self.checar_void(self.analizar_expresion(arbol_expresion))
+        tipo_expresion = self.checar_void(
+            self.analizar_expresion(arbol_expresion))
 
         # Comparar los tipos
         if tipo_llamada_variable != tipo_expresion:
@@ -261,9 +266,6 @@ class AnalizadorSemantico:
                 # Que tiene la cantidad correcta de argumentos
                 # Checar que los argumentos tengan el tipo correcto
                 return self.analizar_llamadafuncion(atomo)
-            elif atomo.data == "funcionesespeciales":
-                # Checar que se llame con el tipo correcto
-                return self.analizar_funcionesespeciales(atomo)
 
     def analizar_llamadavariable(self, arbol_llamada_variable: Tree) -> Tipo:
         nombre_variable = str(arbol_llamada_variable.children[0].children[0])
@@ -306,7 +308,8 @@ class AnalizadorSemantico:
 
         # 3. Checar que los argumentos sean del tipo correcto
         for (argumento, tipo_parametro) in zip(lista_de_arboles_argumentos, funcion_declarada.parametros):
-            tipo_argumento = self.checar_void(self.analizar_expresion(argumento))
+            tipo_argumento = self.checar_void(
+                self.analizar_expresion(argumento))
             if tipo_argumento != tipo_parametro:
                 raise SemanticError(
                     f"Tipos no on iguales: {tipo_argumento} != {tipo_parametro}")

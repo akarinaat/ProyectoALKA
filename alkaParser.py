@@ -91,7 +91,7 @@ ALKA_parser = Lark(
 
     estatutos : estatuto*
 
-    estatuto : (asignacion | expresion | if | while | forloop | return) ";" 
+    estatuto : (asignacion | funcionesespeciales | expresion | if | while | forloop | return) ";" 
 
     return : "return" expresion
 
@@ -103,7 +103,7 @@ ALKA_parser = Lark(
 
     factor : "(" expresion ")" | (PLUS | MINUS)? atomo
 
-    atomo : llamadavariable | CTEF | CTESTR | CTEI | CTEBOOL | funcionesespeciales | llamadafuncion 
+    atomo : llamadavariable | CTEF | CTESTR | CTEI | CTEBOOL  | llamadafuncion 
 
     llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 

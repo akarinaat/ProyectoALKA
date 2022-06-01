@@ -40,7 +40,7 @@ class Funcion:
     tamaño: int
     nombre: str
     direccion_inicio: int
-    # El directorio de variables 
+    # El directorio de variables
     directorio_variables: dict[str, Tuple[str, List[int]]]
     lista_nombres_parametros: list[str]
 
@@ -75,14 +75,14 @@ class GeneracionCuadruplos:
 
         # Esta es para pasar de los nombres a direcciones
         # recibe un str y nos regresa un int (la dirección)
-        self.directorio_variables_globales: Dict[str, Tuple[int, List[int]]] = {
+        self.directorio_variables_globales: Dict[str, Tuple[str, List[int]]] = {
         }
 
         # Cuando se llama una funcion, se mete un directorio nuevo
         # Cuando termina la funcion, se saca un directorio
         # le das el nombre de una variable, y te regresa su ( direccion , lista dimensiones)
         # Cuando se llama una funcion, se agrega un directorio nuevo
-        self.directorio_variables_locales: List[Dict[str, Tuple[int, List[int]]]] = [
+        self.directorio_variables_locales: List[Dict[str, Tuple[str, List[int]]]] = [
             {}]
 
         # el programa que le llega de pruebas (o del usuario) se va al analizador semántico
@@ -166,9 +166,13 @@ class GeneracionCuadruplos:
 
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
-            
+
+            elif estatuto.children[0].data == "funcionesespeciales":
+                return self.generar_cuadruplos_funciones_especiales(estatuto.children[0])
+
 
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
+
     def generar_cuadruplos_llamadafuncion(self, arbol_llamadafuncion: Tree):
 
         # LLAMADA FUNCION SOLO ACEPTA VALORES UNIDIMENSIONALES - AUN NO ARREGLOS
@@ -300,6 +304,7 @@ class GeneracionCuadruplos:
 
 ############### EXPRESION ##################
 
+
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
 
@@ -373,7 +378,7 @@ class GeneracionCuadruplos:
         if isinstance(atomo, Token):
             # print("TOKEN!", atomo, atomo.type)
             if atomo.type == "CTEI":
-                #print("INT")
+                # print("INT")
                 if int(atomo) in self.diccionarioConstates:
                     return self.diccionarioConstates[int(atomo)]
                 else:
@@ -432,12 +437,12 @@ class GeneracionCuadruplos:
             elif atomo.data == "llamadafuncion":
                 return self.generar_cuadruplos_llamadafuncion(atomo)
 
-            elif atomo.data == "funcionesespeciales":
-                pass
+            
 
 ################## ASIGNACION ##########################
     # Lega el arbol de la regla de asignacion
     # Cuadruplo de asignacion: = valor_expresion _ variable
+
     def generar_cuadruplos_asignacion(self, asignacion: Tree) -> Any:
         # asignacion : llamadavariable "=" expresion
         llamada_var_asig = asignacion.children[0]
@@ -718,6 +723,39 @@ class GeneracionCuadruplos:
 
 
 #######   FUNCIONES ESPECIALES #####
+
+
+    def generar_cuadruplos_funciones_especiales(self, arbol_funcs : Tree):
+        funcEsp = arbol_funcs.children[0]
+        if funcEsp.data == "write":
+            expresiones = funcEsp.children
+            
+            for expresion in expresiones:
+                direccion_resultado = self.generar_cuadruplos_expresion(expresion)
+                self.generar_cuadruplo_nuevo("write", direccion_resultado,"","")
+        else :
+            self.generar_cuadruplo_funcion_especial(funcEsp.children[0],funcEsp.data)
+
+    #  nombre "(" llamadavariable ")"
+
+    def generar_cuadruplo_funcion_especial(self, arbol_funcesp:Tree, nombre:str):
+        arbol_llamada_variable = arbol_funcesp.children[0]
+
+        direccion, lista_dimensiones = self.generar_cuadruplos_llamadavariable(
+            arbol_llamada_variable)
+
+        self.generar_cuadruplo_nuevo("ERA","","","")
+        # for dim in lista_dimensiones:
+        #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y 
+                                                          # cuantas son las dimensiones de la variable
+        self.generar_cuadruplo_nuevo(
+                "parames", direccion, "", "")
+        
+        self.generar_cuadruplo_nuevo(nombre,"","","")
+
+
+
+                                
 
 
 
