@@ -106,7 +106,9 @@ class GeneracionCuadruplos:
 
     def generar_cuadruplo_nuevo(self, operacion: Operaciones, operando_izq: str, operando_der: str, direccion: str = None):
         if direccion is None:
-            temporal_actual = "2" + str(self.get_temporal()).zfill(4)
+            temporal_actual = "2" + \
+                str(self.memoria_stack[-1].direcciones_base["temporal"] +
+                    self.get_temporal()).zfill(4)
             cuadruplo = Cuadruplo(operacion, operando_izq,
                                   operando_der, temporal_actual)
             self.listaCuadruplos.append(cuadruplo)
@@ -169,7 +171,6 @@ class GeneracionCuadruplos:
 
             elif estatuto.children[0].data == "funcionesespeciales":
                 return self.generar_cuadruplos_funciones_especiales(estatuto.children[0])
-
 
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
@@ -437,7 +438,6 @@ class GeneracionCuadruplos:
             elif atomo.data == "llamadafuncion":
                 return self.generar_cuadruplos_llamadafuncion(atomo)
 
-            
 
 ################## ASIGNACION ##########################
     # Lega el arbol de la regla de asignacion
@@ -725,38 +725,36 @@ class GeneracionCuadruplos:
 #######   FUNCIONES ESPECIALES #####
 
 
-    def generar_cuadruplos_funciones_especiales(self, arbol_funcs : Tree):
+    def generar_cuadruplos_funciones_especiales(self, arbol_funcs: Tree):
         funcEsp = arbol_funcs.children[0]
         if funcEsp.data == "write":
             expresiones = funcEsp.children
-            
+
             for expresion in expresiones:
-                direccion_resultado = self.generar_cuadruplos_expresion(expresion)
-                self.generar_cuadruplo_nuevo("write", direccion_resultado,"","")
-        else :
-            self.generar_cuadruplo_funcion_especial(funcEsp.children[0],funcEsp.data)
+                direccion_resultado = self.generar_cuadruplos_expresion(
+                    expresion)
+                self.generar_cuadruplo_nuevo(
+                    "write", direccion_resultado, "", "")
+        else:
+            self.generar_cuadruplo_funcion_especial(
+                funcEsp.children[0], funcEsp.data)
 
     #  nombre "(" llamadavariable ")"
 
-    def generar_cuadruplo_funcion_especial(self, arbol_funcesp:Tree, nombre:str):
+    def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
         arbol_llamada_variable = arbol_funcesp.children[0]
 
         direccion, lista_dimensiones = self.generar_cuadruplos_llamadavariable(
             arbol_llamada_variable)
 
-        self.generar_cuadruplo_nuevo("ERA","","","")
+        self.generar_cuadruplo_nuevo("ERA", "", "", "")
         # for dim in lista_dimensiones:
-        #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y 
-                                                          # cuantas son las dimensiones de la variable
+        #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y
+        # cuantas son las dimensiones de la variable
         self.generar_cuadruplo_nuevo(
-                "parames", direccion, "", "")
-        
-        self.generar_cuadruplo_nuevo(nombre,"","","")
+            "parames", direccion, "", "")
 
-
-
-                                
-
+        self.generar_cuadruplo_nuevo(nombre, "", "", "")
 
 
 if __name__ == "__main__":
