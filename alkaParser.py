@@ -110,7 +110,7 @@ ALKA_parser = Lark(
 
     tipo : INT | STRING | FLOAT | BOOL | VOID
 
-    read : "read" "(" llamadavariable ")"
+    read : "read" "(" llamadavariable "," CTESTR ")"
 
     write : "write" "(" expresion ( "," expresion )* ")"
 

@@ -149,6 +149,7 @@ class MaquinaVirtual:
                 self.memoria_parametros_es.append(valor_argumento)
             elif operacion == "write":
                 print(self.obtener_valor(op1))
+            
 
     def obtener_valor(self, direccion: str):
 
@@ -174,7 +175,7 @@ class MaquinaVirtual:
 
 
         if int(direccion_index) < 0:
-            raise RuntimeError ("No se puede: Error de segmentación :'(")
+            return
        # Encontrar en qué memoria está (local global)
         prefijo = direccion_index[0]
         # Acceder a lo qu eno es el prefijo

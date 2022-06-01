@@ -7,6 +7,7 @@ from Memoria import Memoria
 from analizadorSemanticoALKA import AnalizadorSemantico, SemanticError
 from lark import Token, Tree
 import sys
+from operator import mul
 
 
 string_ops = "* / + - decfunc decvar < > != = param goto gotof gosub".split()
@@ -399,15 +400,7 @@ class GeneracionCuadruplos:
                     self.diccionarioConstates[float(atomo)] = direccion
                     return direccion
             elif atomo.type == "CTESTR":
-                if str(atomo) in self.diccionarioConstates:
-                    return self.diccionarioConstates[str(atomo)]
-                else:
-                    direccion = "02" + \
-                        str(self.contadorConstantes["str"]).zfill(3)
-                    self.contadorConstantes["str"] += 1
-                    self.diccionarioConstates[str(atomo)] = direccion
-
-                    return direccion
+                return self.obtener_direccion_ctestring(atomo)
             elif atomo.type == "CTEBOOL":
                 valor = atomo.value == 'True'
                 if valor in self.diccionarioConstates:
@@ -711,6 +704,17 @@ class GeneracionCuadruplos:
         posicion_despues_for = len(self.listaCuadruplos)
         self.listaCuadruplos[posicion_gotof].temporal = posicion_despues_for
 
+    def obtener_direccion_ctestring(self, atomo):
+        if str(atomo) in self.diccionarioConstates:
+            return self.diccionarioConstates[str(atomo)]
+        else:
+            direccion = "02" + \
+                str(self.contadorConstantes["str"]).zfill(3)
+            self.contadorConstantes["str"] += 1
+            self.diccionarioConstates[str(atomo)] = direccion
+
+            return direccion
+
     def hacer_string_cuadruplos(self) -> List[str]:
         lista_string_cuadruplos = [str(cuadruplo)
                                    for cuadruplo in self.listaCuadruplos
@@ -727,8 +731,13 @@ class GeneracionCuadruplos:
 
 
     def generar_cuadruplos_funciones_especiales(self, arbol_funcs_especiales: Tree):
+
+        #funcionesespeciales : read | write | hist | mean | mode |  variance
+
         funcEsp = arbol_funcs_especiales.children[0]
+
         if funcEsp.data == "write":
+            # write : "write" "(" expresion ( "," expresion )* ")"
             expresiones = funcEsp.children
 
             for expresion in expresiones:
@@ -744,20 +753,28 @@ class GeneracionCuadruplos:
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
 
-            for dim in lista_dims_args_funcesp:
-                self.generar_cuadruplo_nuevo(
-                    "DIM", self.obtener_direccion_constante(str(dim)), "", "")
-            
-            self.generar_cuadruplo_nuevo("read",direccion_argumento,"","")
+            d1xm1 = reduce(mul, lista_dims_args_funcesp,1) #mul es la operación de multiplicacion
 
-            return -1 #porque es void :)
+            # self.generar_cuadruplo_nuevo("ERA", "read", "", "")
+
+            # for dim in lista_dims_args_funcesp:
+            #     self.generar_cuadruplo_nuevo(
+            #         "DIM", self.obtener_direccion_constante(str(dim)), "", "")
+
+            # tiene el nombre de la funcion, dirección del argumento, direccion de la constante (str) que tiene el nombre 
+            # del archivo, el tamaño de la variable 
+            # funcEsp.children[1] --> nombre del archivo
+            self.generar_cuadruplo_nuevo(
+                "read", direccion_argumento, self.obtener_direccion_ctestring(funcEsp.children[1]), d1xm1)
+
+            return -1  # porque es void :)
 
         else:
             self.generar_cuadruplo_funcion_especial(
                 funcEsp.children[0], funcEsp.data)
 
-
     #  nombre "(" llamadavariable ")"
+
     def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
         arbol_llamada_variable = arbol_funcesp.children[0]
 
