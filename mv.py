@@ -151,6 +151,9 @@ class MaquinaVirtual:
                 print(self.obtener_valor(op1))
 
     def obtener_valor(self, direccion: str):
+
+        if int(direccion) < 0:
+            raise RuntimeError("No se puede acceder a una dirección void: Error de Segmentación")
         # Encontrar en qué memoria está (local global)
         prefijo = direccion[0]
         # Acceder a lo qu eno es el prefijo
@@ -165,6 +168,7 @@ class MaquinaVirtual:
         elif prefijo == '2':
             # Regresa
             return self.memoria_stack[-1].espacio_memoria[int(direccion)]
+
 
     def guardar_valor(self, valor, direccion_index):
        # Encontrar en qué memoria está (local global)

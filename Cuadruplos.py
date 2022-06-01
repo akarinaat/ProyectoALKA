@@ -169,8 +169,7 @@ class GeneracionCuadruplos:
             elif estatuto.children[0].data == "return":
                 self.generar_cuadruplos_return(estatuto.children[0])
 
-            elif estatuto.children[0].data == "funcionesespeciales":
-                return self.generar_cuadruplos_funciones_especiales(estatuto.children[0])
+            
 
     # llamadafuncion :  id "(" (expresion  ("," expresion)*)? ")"
 
@@ -437,6 +436,8 @@ class GeneracionCuadruplos:
                 # TODO FALTA TODO LO DE DIMENSIONES
             elif atomo.data == "llamadafuncion":
                 return self.generar_cuadruplos_llamadafuncion(atomo)
+            elif atomo.data == "funcionesespeciales":
+                return self.generar_cuadruplos_funciones_especiales(atomo)
 
 
 ################## ASIGNACION ##########################
@@ -735,6 +736,10 @@ class GeneracionCuadruplos:
                     expresion)
                 self.generar_cuadruplo_nuevo(
                     "write", direccion_resultado, "", "")
+            return -1 #-1 para decir que es dirección void
+        elif funcEsp.data == "read":
+            llamada_variable = arbol_funcs.children[0] #llamadavariable
+            
         else:
             self.generar_cuadruplo_funcion_especial(
                 funcEsp.children[0], funcEsp.data)

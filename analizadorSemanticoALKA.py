@@ -266,8 +266,8 @@ class AnalizadorSemantico:
                 # Que tiene la cantidad correcta de argumentos
                 # Checar que los argumentos tengan el tipo correcto
                 return self.analizar_llamadafuncion(atomo)
-
-    def analizar_llamadavariable(self, arbol_llamada_variable: Tree) -> Tipo:
+    
+    def checar_que_exista_variable(self, arbol_llamada_variable:Tree)-> Variable:
         nombre_variable = str(arbol_llamada_variable.children[0].children[0])
         # Checar que esté declarada
         variable = None
@@ -278,6 +278,11 @@ class AnalizadorSemantico:
 
         if variable is None:
             raise SemanticError("Error, la variable no esta declarada")
+        
+        return variable
+
+    def analizar_llamadavariable(self, arbol_llamada_variable: Tree) -> Tipo:
+        variable = self.checar_que_exista_variable(arbol_llamada_variable)
         # Checar que se llame con la cantidad de dimensiones correcta (por ejemplo si es una matriz de dos dimensiones)
         len_dimensiones = len(arbol_llamada_variable.children[1:])
         if len_dimensiones != variable.dimensiones:
@@ -424,11 +429,14 @@ class AnalizadorSemantico:
     def analizar_funcion_especial(self, arbol_funcEsp: Tree, isNum=False):
 
         arbol_llamada_variable = arbol_funcEsp.children[0]
-        tipo_llamada_variable = self.analizar_llamadavariable(
+        variable = self.checar_que_exista_variable(
             arbol_llamada_variable)
 
+        if len(variable.dimensiones) == 0: # --> Para ver si el valor de la dimension es mayor 0, entonces es arreglo
+            raise SemanticError ("No se puede llamar a funcion especial con variable escalar")
+
         if isNum:
-            if tipo_llamada_variable != Tipo.Int and tipo_llamada_variable != Tipo.Float:
+            if variable.tipo != Tipo.Int and variable.tipo != Tipo.Float:
                 raise SemanticError(
                     "Esta función especial no se puede llamar con una variable NO numérica")
 
