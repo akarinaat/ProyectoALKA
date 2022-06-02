@@ -148,7 +148,9 @@ class MaquinaVirtual:
     def obtener_valor(self, direccion: str):
         # checar si es apuntador
         if direccion[0] == "(":
-            direccion = str(self.obtener_valor(direccion[1:-1]))
+            direccion = str(self.obtener_valor(direccion[1:-1])) #para acceder al valor de la dirección
+                                                                    # de manera recirsiva [1:-1] --> direccion
+                                                                    #en medio de los paréntesis
 
         if int(direccion) < 0:
             raise RuntimeError(
