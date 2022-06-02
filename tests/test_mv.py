@@ -82,17 +82,85 @@ def test_arreglos2():
     
     assert res == 55
     
-def test_arreglos():
+
+def test_while():
     programa = """
-    var int: a[3];
+    main(){
+        var int: a;
+        a = 1;
+        while(a<5){
+           a = a+1;
+        };
+        return a;
+    } """
 
-
-     main (){
-         a[2] = 5;
-        return  a[2];
-    }
-    """
-    res= compilar_y_correr(programa)
-    
+    res = compilar_y_correr(programa)
     assert res == 5
 
+def test_forloop():
+    programa = """main(){
+        var int: a;
+        for a = 0 to 10 {      
+          4+5;
+        };
+        return a;
+    }"""
+
+    res = compilar_y_correr(programa)
+    assert res == 10
+
+def test_if_():
+    programa = """main(){
+        var int: a,b;
+        a = 6;
+        b = 3;
+        if(a>b){
+          return 5;
+        };
+        
+    } """
+
+    res = compilar_y_correr(programa)
+    assert res == 5
+    
+def test_if_false():
+    programa = """main(){
+        var int: a,b;
+        a = 6;
+        b = 3;
+        if(a>b){
+          3+2;
+        };
+        return a;
+    } """
+
+    res = compilar_y_correr(programa)
+    assert res == 6
+
+def test_if_else():
+
+     programa = """main(){
+        var int: a,b ;
+        a = 8;
+        b= 4;
+        if(a>b){
+           return 3+2;
+        }else{
+           return 5+6;
+        };
+      
+
+    } """
+
+     res = compilar_y_correr(programa)
+     assert res == 5
+
+def test_prueba_asignacion():
+    programa = """ main(){
+                var int: a;
+                a = 3;
+                return a;
+                } """
+
+    res = compilar_y_correr(programa)
+    assert res == 3
