@@ -222,5 +222,5 @@ def test_print():
     analizador = AnalizadorSemantico(programa)
     analizador.analizarArbol()
     print(analizador.directoriosVariables)
-    assert 1 == 2
+    
 

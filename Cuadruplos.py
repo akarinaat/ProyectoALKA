@@ -506,7 +506,7 @@ class GeneracionCuadruplos:
         # agregar el indice a la direccion base
         # regresa dirección y lista de dimensiones
         ######## PARA PASAR ARREGLOS A FUNCIONES ESPECIALES ###############
-        return self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal), lista_dimensiones
+        return "("+self.generar_cuadruplo_nuevo("+", direccion_constante_base, direccion_indice_final_temporal)+")", lista_dimensiones
 
     def obtener_direccion_constante(self, constante: str):
         if int(constante) in self.diccionarioConstates:

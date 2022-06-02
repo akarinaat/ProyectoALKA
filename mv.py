@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from operator import indexOf
 import sys
+from typing import Any
 from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
 import numpy as np
@@ -13,15 +14,11 @@ class MaquinaVirtual:
     # La máquina virtual empieza a leer el archivo con
     # el código intermedio (cuádruplos) generados en compilación
     # Le llega el nombre del archivo
-    def __init__(self, archivo_cuadruplos) -> None:
-        cuadruplos = ""
-
-        with open(archivo_cuadruplos, "r") as archivo:
-            cuadruplos = archivo.read()
+    def __init__(self, cuadruplos):
 
         self.lista_cuadruplos = cuadruplos.split("\n")
 
-        self.memoria_constantes = np.empty(5000,dtype=object)
+        self.memoria_constantes = np.empty(5000, dtype=object)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
         self.memoria_parametros_es = []
@@ -37,9 +34,7 @@ class MaquinaVirtual:
         for key, value in diccionario_consts.items():
             self.memoria_constantes[int(value)] = key
 
-        self.ejecutar_programa()
-
-    def ejecutar_programa(self):
+    def ejecutar_programa(self) -> Any:
         while(int(self.instruccion_actual) < len(self.lista_cuadruplos)):
             cuadruplo_actual_split = self.lista_cuadruplos[int(self.instruccion_actual)].split(
                 ",")
@@ -121,7 +116,7 @@ class MaquinaVirtual:
                 # Checar si es el  del main
                 if len(self.stack_direcciones_return) == 0:
                     # Imprimir resultado a consola
-                    print(resultado)
+                    print(resultado, "El resultado!")
                     return resultado
 
                 donde_guardar_resultado = self.stack_direcciones_return.pop()
@@ -149,16 +144,20 @@ class MaquinaVirtual:
                 self.memoria_parametros_es.append(valor_argumento)
             elif operacion == "write":
                 print(self.obtener_valor(op1))
-            
 
     def obtener_valor(self, direccion: str):
+        # checar si es apuntador
+        if direccion[0] == "(":
+            direccion = str(self.obtener_valor(direccion[1:-1]))
 
         if int(direccion) < 0:
-            raise RuntimeError("No se puede acceder a una dirección void: Error de Segmentación")
+            raise RuntimeError(
+                "No se puede acceder a una dirección void: Error de Segmentación")
         # Encontrar en qué memoria está (local global)
         prefijo = direccion[0]
         # Acceder a lo qu eno es el prefijo
         direccion = direccion[1:]
+
         if prefijo == '0':
             return self.memoria_constantes[int(direccion)]
         elif prefijo == '1':
@@ -170,9 +169,10 @@ class MaquinaVirtual:
             # Regresa
             return self.memoria_stack[-1].espacio_memoria[int(direccion)]
 
-
-    def guardar_valor(self, valor, direccion_index):
-
+    def guardar_valor(self, valor, direccion_index: str):
+        # checar si es apuntador
+        if direccion_index[0] == "(":
+            direccion_index = str(self.obtener_valor(direccion_index[1:-1]))
 
         if int(direccion_index) < 0:
             return
@@ -194,5 +194,10 @@ class MaquinaVirtual:
 
 
 if __name__ == "__main__":
+
+    cuadruplos = ""
+
+    with open(archivo_cuadruplos, "r") as archivo:
+        cuadruplos = archivo.read()
     # MaquinaVirtual(sys.argv[1])
-    MaquinaVirtual("test.out")
+    MaquinaVirtual(cuadruplos)
