@@ -5,7 +5,7 @@ from typing import Any
 from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
 import numpy as np
-
+from scipy import stats
 # Ejecucion
 
 
@@ -138,19 +138,48 @@ class MaquinaVirtual:
 
                 self.memoria_funcion_a_llamar.espacio_memoria[int(
                     direccion[1:])] = valor_argumento
-
             elif operacion == "parames":
                 valor_argumento = self.obtener_valor(op1)
                 self.memoria_parametros_es.append(valor_argumento)
             elif operacion == "write":
                 print(self.obtener_valor(op1))
+            elif operacion == "mean":
+                resultado = np.mean(self.obtener_arreglo(
+                    op1, self.obtener_valor(op2)))
+                self.guardar_valor(resultado, direccion)
+            elif operacion == "mode":
+                resultado = stats.mode(self.obtener_arreglo(
+                    op1, self.obtener_valor(op2)))
+                self.guardar_valor(resultado, direccion)
+            elif operacion == "variance":
+                resultado = np.var(self.obtener_arreglo(
+                    op1, self.obtener_valor(op2)))
+                self.guardar_valor(resultado, direccion)
+            elif operacion == "hist":
+                dim1 = self.obtener_valor(op2)
+                dim2 = self.obtener_valor(direccion)
+
+                tamaño = dim1*dim2
+
+                matriz = np.reshape(self.obtener_arreglo(
+                    op1, tamaño), (dim1, dim2))
+
+    def obtener_arreglo(self, inicio: str, tamaño: int):
+        prefijo = inicio[0]
+        direccion_inicio = int(inicio[1:])
+        direccion_fin = direccion_inicio + tamaño
+        if prefijo == "1":
+            return self.memoria_global.espacio_memoria[direccion_inicio+direccion_fin]
+        elif prefijo == "2":
+            return self.memoria_stack[-1].espacio_memoria[direccion_inicio+direccion_fin]
 
     def obtener_valor(self, direccion: str):
         # checar si es apuntador
         if direccion[0] == "(":
-            direccion = str(self.obtener_valor(direccion[1:-1])) #para acceder al valor de la dirección
-                                                                    # de manera recirsiva [1:-1] --> direccion
-                                                                    #en medio de los paréntesis
+            # para acceder al valor de la dirección
+            direccion = str(self.obtener_valor(direccion[1:-1]))
+            # de manera recursiva [1:-1] --> direccion
+            # en medio de los paréntesis porque tengo que hacer doble por lo del apuntador (tp1)
 
         if int(direccion) < 0:
             raise RuntimeError(

@@ -780,8 +780,9 @@ class GeneracionCuadruplos:
                 llamada_variable)
             
             tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+            direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("mean",direccion_argumento,tamaño) #como no le mando en donde lo va a guardar
+            return self.generar_cuadruplo_nuevo("mean",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
                                                                             # solito lo genera 
         elif funcEsp.data == "mode":
                #1  mean: "mean" "(" llamadavariable ")"
@@ -792,11 +793,12 @@ class GeneracionCuadruplos:
                 llamada_variable)
             
             tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+            direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
             return self.generar_cuadruplo_nuevo("mode",direccion_argumento,tamaño) #como no le mando en donde lo va a guardar
                                                                             # solito lo genera 
         elif funcEsp.data == "variance":
-               #1  mean: "mean" "(" llamadavariable ")"
+            #1  mean: "mean" "(" llamadavariable ")"
             llamada_variable = funcEsp.children[0] # este ya es del variance
 
             #2 direccion 
@@ -804,30 +806,41 @@ class GeneracionCuadruplos:
                 llamada_variable)
             
             tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+            direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("variance",direccion_argumento,tamaño) #como no le mando en donde lo va a guardar
-                                                                            # solito lo genera 
+            return self.generar_cuadruplo_nuevo("variance",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
+        
+        elif funcEsp.data == "hist":
+            
+             #1  mean: "mean" "(" llamadavariable ")"
+            llamada_variable = funcEsp.children[0] # este ya es del variance  
+            #2 direccion 
+            direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
+                llamada_variable)
+            direccion_dim1= self.obtener_direccion_constante(str(lista_dims_args_funcesp[0]))
+            direccion_dim2= self.obtener_direccion_constante(str(lista_dims_args_funcesp[1]))
 
-        else:
-            self.generar_cuadruplo_funcion_especial(
-                funcEsp.children[0], funcEsp.data)
+
+            self.generar_cuadruplo_nuevo("hist",direccion_argumento,direccion_dim1,direccion_dim2)                                                                 # solito lo genera 
+
+      
 
     #  nombre "(" llamadavariable ")"
 
-    def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
-        arbol_llamada_variable = arbol_funcesp.children[0]
+    # def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
+    #     arbol_llamada_variable = arbol_funcesp.children[0]
 
-        direccion, lista_dimensiones = self.generar_cuadruplos_llamadavariable(
-            arbol_llamada_variable)
+    #     direccion, lista_dimensiones = self.generar_cuadruplos_llamadavariable(
+    #         arbol_llamada_variable)
 
-        self.generar_cuadruplo_nuevo("ERA", "", "", "")
-        # for dim in lista_dimensiones:
-        #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y
-        # cuantas son las dimensiones de la variable
-        self.generar_cuadruplo_nuevo(
-            "parames", direccion, "", "")
+    #     self.generar_cuadruplo_nuevo("ERA", "", "", "")
+    #     # for dim in lista_dimensiones:
+    #     #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y
+    #     # cuantas son las dimensiones de la variable
+    #     self.generar_cuadruplo_nuevo(
+    #         "parames", direccion, "", "")
 
-        self.generar_cuadruplo_nuevo(nombre, "", "", "")
+    #     self.generar_cuadruplo_nuevo(nombre, "", "", "")
 
 
 if __name__ == "__main__":

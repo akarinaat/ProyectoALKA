@@ -401,8 +401,8 @@ class AnalizadorSemantico:
             return Tipo.Void
 
         elif arbol_funcionesespeciales.children[0].data == "hist":
-            self.analizar_funcion_especial(
-                arbol_funcionesespeciales.children[0], True)
+            self.analizar_hist(
+                arbol_funcionesespeciales.children[0])
             return Tipo.Void
 
         elif arbol_funcionesespeciales.children[0].data == "mean":
@@ -438,6 +438,19 @@ class AnalizadorSemantico:
             if variable.tipo != Tipo.Int and variable.tipo != Tipo.Float:
                 raise SemanticError(
                     "Esta función especial no se puede llamar con una variable NO numérica")
+
+    def analizar_hist(self, arbol_hist:Tree) -> None:
+        llamada_variable = arbol_hist.children[0]
+
+        variable = self.checar_que_exista_variable(llamada_variable)
+
+        if len(variable.dimensiones) != 2: # porque a fuerza tiene que ser una matriz
+            raise SemanticError("Hist solo acepta variables de dos dimensiones")
+
+        if variable.tipo != Tipo.Int and variable.tipo != Tipo.Float:
+                raise SemanticError(
+                    "Histo solo se puede llamar con variable numérica")
+        
 
     def checar_void(self, tipo):
 
