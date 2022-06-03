@@ -500,7 +500,7 @@ class GeneracionCuadruplos:
                 "*", direccion_m_temporal, direccion_dimension_constante, direccion_m_temporal)
 
             self.generar_cuadruplo_nuevo(
-                "ver", direccion_indice_temporal, dimension, "")
+                "ver", direccion_indice_temporal, self.obtener_direccion_constante(dimension), "")
         # print(id_var, "el nombre de llamada variable")
 
         # agregar el indice a la direccion base
@@ -795,7 +795,7 @@ class GeneracionCuadruplos:
             tamaño = reduce(mul, lista_dims_args_funcesp,1) 
             direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("mode",direccion_argumento,tamaño) #como no le mando en donde lo va a guardar
+            return self.generar_cuadruplo_nuevo("mode",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
                                                                             # solito lo genera 
         elif funcEsp.data == "variance":
             #1  mean: "mean" "(" llamadavariable ")"
@@ -818,10 +818,10 @@ class GeneracionCuadruplos:
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
             direccion_dim1= self.obtener_direccion_constante(str(lista_dims_args_funcesp[0]))
-            direccion_dim2= self.obtener_direccion_constante(str(lista_dims_args_funcesp[1]))
+            # direccion_dim2= self.obtener_direccion_constante(str(lista_dims_args_funcesp[1]))
+                #porque ya no hay matriz, se quedó cmo arreglo
 
-
-            self.generar_cuadruplo_nuevo("hist",direccion_argumento,direccion_dim1,direccion_dim2)                                                                 # solito lo genera 
+            self.generar_cuadruplo_nuevo("hist",direccion_argumento,direccion_dim1,"")                                                                 # solito lo genera 
 
       
 

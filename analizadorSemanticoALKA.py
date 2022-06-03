@@ -431,7 +431,7 @@ class AnalizadorSemantico:
         variable = self.checar_que_exista_variable(
             arbol_llamada_variable)
 
-        if len(variable.dimensiones) == 0: # --> Para ver si el valor de la dimension es mayor 0, entonces es arreglo
+        if variable.dimensiones == 0: # --> Para ver si el valor de la dimension es mayor 0, entonces es arreglo
             raise SemanticError ("No se puede llamar a funcion especial con variable escalar")
 
         if isNum:
@@ -444,8 +444,8 @@ class AnalizadorSemantico:
 
         variable = self.checar_que_exista_variable(llamada_variable)
 
-        if len(variable.dimensiones) != 2: # porque a fuerza tiene que ser una matriz
-            raise SemanticError("Hist solo acepta variables de dos dimensiones")
+        if variable.dimensiones != 1: # variables de una dimension (arreglo)
+            raise SemanticError("Hist solo acepta variables de una dimension")
 
         if variable.tipo != Tipo.Int and variable.tipo != Tipo.Float:
                 raise SemanticError(

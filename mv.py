@@ -6,6 +6,7 @@ from Cuadruplos import Alcance, Cuadruplo
 from Memoria import Memoria
 import numpy as np
 from scipy import stats
+from matplotlib import pyplot as plt
 # Ejecucion
 
 
@@ -85,7 +86,7 @@ class MaquinaVirtual:
                 self.guardar_valor(izq, direccion)
             elif operacion == "ver":
                 indice = self.obtener_valor(op1)
-                limite = int(op2)
+                limite = self.obtener_valor(op2)
 
                 if indice > limite or indice < 0:
                     raise RuntimeError(
@@ -149,29 +150,40 @@ class MaquinaVirtual:
                 self.guardar_valor(resultado, direccion)
             elif operacion == "mode":
                 resultado = stats.mode(self.obtener_arreglo(
-                    op1, self.obtener_valor(op2)))
+                    op1, self.obtener_valor(op2)),axis=None)
                 self.guardar_valor(resultado, direccion)
             elif operacion == "variance":
                 resultado = np.var(self.obtener_arreglo(
                     op1, self.obtener_valor(op2)))
                 self.guardar_valor(resultado, direccion)
             elif operacion == "hist":
-                dim1 = self.obtener_valor(op2)
-                dim2 = self.obtener_valor(direccion)
+                print("JOLA")
+                tamaño = self.obtener_valor(op2)
+                arreglo_para_hist = self.obtener_arreglo(op1, tamaño)
+                plt.hist(arreglo_para_hist)
+                plt.show()
+                print(arreglo_para_hist)
+                # dim1 = self.obtener_valor(op2)
+                # dim2 = self.obtener_valor(direccion)
 
-                tamaño = dim1*dim2
+                # tamaño = dim1*dim2
 
-                matriz = np.reshape(self.obtener_arreglo(
-                    op1, tamaño), (dim1, dim2))
+                # matriz = np.reshape(self.obtener_arreglo(
+                #     op1, tamaño), (dim1, dim2))
+                # hist, bins = np.histogram(matriz)
+                # plt.hist()
 
     def obtener_arreglo(self, inicio: str, tamaño: int):
         prefijo = inicio[0]
+        if prefijo == "(":
+            inicio = str(self.obtener_valor(inicio[1:-1]))
+            prefijo = inicio[0]
         direccion_inicio = int(inicio[1:])
         direccion_fin = direccion_inicio + tamaño
         if prefijo == "1":
-            return self.memoria_global.espacio_memoria[direccion_inicio+direccion_fin]
+            return np.copy(self.memoria_global.espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin])
         elif prefijo == "2":
-            return self.memoria_stack[-1].espacio_memoria[direccion_inicio+direccion_fin]
+            return np.copy(self.memoria_stack[-1].espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin])
 
     def obtener_valor(self, direccion: str):
         # checar si es apuntador
@@ -228,7 +240,7 @@ if __name__ == "__main__":
 
     cuadruplos = ""
 
-    with open(archivo_cuadruplos, "r") as archivo:
+    with open("test.out", "r") as archivo:
         cuadruplos = archivo.read()
     # MaquinaVirtual(sys.argv[1])
-    MaquinaVirtual(cuadruplos)
+    MaquinaVirtual(cuadruplos).ejecutar_programa()

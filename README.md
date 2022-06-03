@@ -208,6 +208,33 @@ Falta hacer pruebas
 
 Fecha de entrega: Mayo 30 2022
 
+## Octava entrega
+
+- Analysis semántico de funciones especiales
+- Generation cuádruplos del write
+- Arreglé memoria temporales
+- Análisis dimensiones funciones especiales
+- Cambios en gramática
+- Mean, mode y variance regresan un float. Read, write y hist son void. - - -   - Análisis semántico de ese cambio
+- Cambió la gramática del read para ponerle CSV
+- Cuádruplos del read
+- Agregué apuntadores a mi malaquita virtual
+- Análisis de Hist
+- Cuádruplos de funciones especiales
+- MV para funciones especiales
+- Logré pasar arreglos a función especial
+- Terminé la MV de funciones especiales
+- Histograma regresa un histograma
+- Mode regresa la moda
+- Mean regresa el promedio
+- write hace prints
+
+Fatla read csv
+
+Fecha de entrega Junio 3 2022
+
+
+
 
 
 

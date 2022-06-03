@@ -156,6 +156,7 @@ def test_if_else():
      assert res == 5
 
 def test_prueba_asignacion():
+
     programa = """ main(){
                 var int: a;
                 a = 3;
@@ -164,3 +165,47 @@ def test_prueba_asignacion():
 
     res = compilar_y_correr(programa)
     assert res == 3
+
+def test_prueba_promedio():
+
+    programa = """ main(){
+    var int: a[7];
+    var int: x;
+
+    a[0] = 7;
+    a[1] = 2;
+    a[2] = 8;
+    a[3] = 2;
+    a[4] = 4;
+    a[5] = 5;
+    a[6] = 7;
+    return mean(a);
+
+    
+} """
+
+    res = compilar_y_correr(programa)
+    assert res == 5
+
+def test_prueba_moda():
+
+    programa = """ main(){
+    var int: a[7];
+    var int: x;
+
+    a[0] = 7;
+    a[1] = 2;
+    a[2] = 8;
+    a[3] = 2;
+    a[4] = 4;
+    a[5] = 5;
+    a[6] = 7;
+    return mode(a);
+
+    
+} """
+
+    res = compilar_y_correr(programa)
+    assert res == 7
+
+
