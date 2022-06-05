@@ -133,6 +133,8 @@ class AnalizadorSemantico:
 
         if tipo == Tipo.Void and len(lista_tipos_return) != 0:
             raise SemanticError("Una funcion void no puede regresar nada")
+        elif tipo != Tipo.Void and len(lista_tipos_return) == 0:
+            raise SemanticError("Una función que es void tiene que regresar algo")
 
         for tipo_return in lista_tipos_return:
             if tipo_return != tipo:

@@ -28,7 +28,9 @@ def test_analisis_decvar_dimensiones():
 
 
 def test_analisis_decfunc():
-    programa = """func int foo () {}
+    programa = """func int foo () {
+        return 1;
+    }
         main(){}"""
 
     analizador = AnalizadorSemantico(programa)
@@ -41,7 +43,7 @@ def test_analisis_decfunc():
 def test_analisis_decfunc_simple():
     programa = """
         var int:a;
-        func int foo () {
+        func void foo () {
             var float: c;
         }
         main(){}"""

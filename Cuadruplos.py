@@ -284,6 +284,7 @@ class GeneracionCuadruplos:
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
 
+
     def asignar_espacio_parametros(self, arbol_parametros: Tree) -> list[str]:
         lista_nombres = []
         for parametro in arbol_parametros.children:

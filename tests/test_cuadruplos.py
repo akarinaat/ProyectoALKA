@@ -107,7 +107,7 @@ def test_for():
 def test_llamadafuncion():
     programa = """ 
     func int foo(a int, b int){
-        a+b;
+        return a+b;
     }
     main(){
         foo(2*3,5+4);
@@ -120,7 +120,8 @@ def test_llamadafuncion():
 def test_decfunc():
     programa = """ 
     func int foo(a int, b int){
-        a+b;
+        return a+b;
+
     }
     main(){
         
@@ -128,7 +129,7 @@ def test_decfunc():
     generador = GeneracionCuadruplos(programa)
     generador.generar_cuadruplos_programa()
     print(generador.listaCuadruplos)
-    assert len(generador.listaCuadruplos) == 3
+    assert len(generador.listaCuadruplos) == 4
 
 
 def test_decvar_memoria_arreglo():
