@@ -122,7 +122,6 @@ ALKA_parser = Lark(
 
     mode: "mode" "(" llamadavariable  ")"
 
-
     variance: "variance" "(" llamadavariable ")"
 
 

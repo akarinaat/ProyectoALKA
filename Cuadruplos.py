@@ -541,7 +541,7 @@ class GeneracionCuadruplos:
             lista_dimensiones = [] if len(
                 lista_CTEIs_dimensiones) == 0 else [int(str(dim)) for dim in lista_CTEIs_dimensiones]
 
-            tamano = reduce(lambda x, y: x*y, lista_dimensiones, 1)
+            tamano = reduce(mul, lista_dimensiones, 1)
             print(tamano)
             cantidad_expresiones = len(lista_CTEIs_dimensiones)
 
@@ -750,7 +750,7 @@ class GeneracionCuadruplos:
             return -1  # -1 para decir que es dirección void
         elif funcEsp.data == "read":
             # llamadavariable , ya es el read
-            llamada_variable = arbol_funcs_especiales.children[0]
+            llamada_variable = funcEsp.children[0]
             # direccion y dimensiones de esa llamada variable
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
@@ -767,7 +767,7 @@ class GeneracionCuadruplos:
             # del archivo, el tamaño de la variable 
             # funcEsp.children[1] --> nombre del archivo
             self.generar_cuadruplo_nuevo(
-                "read", direccion_argumento, self.obtener_direccion_ctestring(funcEsp.children[1]), d1xm1)
+                "read", direccion_argumento, self.obtener_direccion_ctestring(funcEsp.children[1]), self.obtener_direccion_constante(d1xm1))
 
             return -1  # porque es void :)
         
@@ -823,35 +823,17 @@ class GeneracionCuadruplos:
 
             self.generar_cuadruplo_nuevo("hist",direccion_argumento,direccion_dim1,"")                                                                 # solito lo genera 
 
-      
-
-    #  nombre "(" llamadavariable ")"
-
-    # def generar_cuadruplo_funcion_especial(self, arbol_funcesp: Tree, nombre: str):
-    #     arbol_llamada_variable = arbol_funcesp.children[0]
-
-    #     direccion, lista_dimensiones = self.generar_cuadruplos_llamadavariable(
-    #         arbol_llamada_variable)
-
-    #     self.generar_cuadruplo_nuevo("ERA", "", "", "")
-    #     # for dim in lista_dimensiones:
-    #     #     self.generar_cuadruplo_nuevo("DIM",dim,"","") #para decirle a la mv cuales y
-    #     # cuantas son las dimensiones de la variable
-    #     self.generar_cuadruplo_nuevo(
-    #         "parames", direccion, "", "")
-
-    #     self.generar_cuadruplo_nuevo(nombre, "", "", "")
 
 
 if __name__ == "__main__":
 
     # Voy a leer el archivo que contiene el código fuente
     # ArchivoIn tiene el string de lo que es el programa (tipo el string que hay en las pruebas, not exactly but like that)
-    # archivoIn = sys.argv[1]
-    archivoIn = "test.alka"
+    archivoIn = sys.argv[1]
+    # archivoIn = "test.alka"
     # Es el que contiene el código intermedio
-    # archivoOut = sys.argv[2]
-    archivoOut = "test.out"
+    archivoOut = sys.argv[2]
+    # archivoOut = "test.out"
     # Abre y cierra sin el close
     with open(archivoIn, "r") as codigo:
         generador = GeneracionCuadruplos(codigo.read())

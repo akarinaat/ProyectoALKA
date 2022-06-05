@@ -22,7 +22,6 @@ class MaquinaVirtual:
         self.memoria_constantes = np.empty(5000, dtype=object)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
-        self.memoria_parametros_es = []
         self.instruccion_actual = 0
 
         self.memoria_global = Memoria()
@@ -139,9 +138,7 @@ class MaquinaVirtual:
 
                 self.memoria_funcion_a_llamar.espacio_memoria[int(
                     direccion[1:])] = valor_argumento
-            elif operacion == "parames":
-                valor_argumento = self.obtener_valor(op1)
-                self.memoria_parametros_es.append(valor_argumento)
+
             elif operacion == "write":
                 print(self.obtener_valor(op1))
             elif operacion == "mean":
@@ -149,9 +146,11 @@ class MaquinaVirtual:
                     op1, self.obtener_valor(op2)))
                 self.guardar_valor(resultado, direccion)
             elif operacion == "mode":
-                resultado = stats.mode(self.obtener_arreglo(
-                    op1, self.obtener_valor(op2)),axis=None)
-                self.guardar_valor(resultado, direccion)
+                vals,counts = np.unique(self.obtener_arreglo(
+                    op1, self.obtener_valor(op2)), return_counts=True)
+                index = np.argmax(counts)
+                self.guardar_valor(vals[index], direccion)
+
             elif operacion == "variance":
                 resultado = np.var(self.obtener_arreglo(
                     op1, self.obtener_valor(op2)))
@@ -172,6 +171,29 @@ class MaquinaVirtual:
                 #     op1, tamaño), (dim1, dim2))
                 # hist, bins = np.histogram(matriz)
                 # plt.hist()
+            elif operacion == "read":
+                direccion_arg = op1
+                nombre_arch = self.obtener_valor(op2)[1:-1] # para quitar comillas
+                tamano = self.obtener_valor(direccion)
+
+                # puse el [:tamano] para asegurar que solo la cantidad de
+                # datos correctos se escriban.
+                datos = np.loadtxt(nombre_arch,delimiter=",",dtype=np.number).flatten()[:tamano]
+
+                self.guardar_arreglo(direccion_arg,tamano,datos)
+  
+  
+    def guardar_arreglo(self, inicio: str, tamaño: int,valor):
+        prefijo = inicio[0]
+        if prefijo == "(":
+            inicio = str(self.obtener_valor(inicio[1:-1]))
+            prefijo = inicio[0]
+        direccion_inicio = int(inicio[1:])
+        direccion_fin = direccion_inicio + tamaño
+        if prefijo == "1":
+            self.memoria_global.espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin]= valor
+        elif prefijo == "2":
+            self.memoria_stack[-1].espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin] = valor
 
     def obtener_arreglo(self, inicio: str, tamaño: int):
         prefijo = inicio[0]
@@ -240,7 +262,7 @@ if __name__ == "__main__":
 
     cuadruplos = ""
 
-    with open("test.out", "r") as archivo:
+    with open(sys.argv[1], "r") as archivo:
         cuadruplos = archivo.read()
-    # MaquinaVirtual(sys.argv[1])
+    # MaquinaVirtual()
     MaquinaVirtual(cuadruplos).ejecutar_programa()

@@ -198,7 +198,7 @@ def test_prueba_moda():
     a[2] = 8;
     a[3] = 2;
     a[4] = 4;
-    a[5] = 5;
+    a[5] = 7;
     a[6] = 7;
     return mode(a);
 

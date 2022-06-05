@@ -15,8 +15,7 @@ class Memoria:
 
         self.tamano_seccion = self.direccion_base_str+self.rango_espacios
 
-        self.espacio_memoria = np.empty(20000, dtype=object)
-
+      
         self.direcciones_base = {
             "int": self.direccion_base_ints,
             "float": self.direccion_base_floats,
@@ -39,5 +38,9 @@ class Memoria:
                                            "str": 0
                                            }
 
+        # para MV
+        self.espacio_memoria = np.empty(20000, dtype=object)
 
-# importante tener la tabla de variables para poder generar direcciones
+
+
+
