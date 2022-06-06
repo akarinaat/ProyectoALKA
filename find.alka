@@ -1,0 +1,23 @@
+func int find(elemento int){
+	var int: a[11];
+
+	var int: i;
+
+	read(a, "sort.csv");
+
+	for i = 0 to 11{
+		if (a[i] == elemento){
+			return i;
+		};
+	};
+
+	return -1;
+}
+
+main(){
+	var int: a;
+
+	a= find(55);
+
+	write("elemento encontrado en el indice: ",a);
+}

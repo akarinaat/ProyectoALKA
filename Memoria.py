@@ -38,8 +38,20 @@ class Memoria:
                                            "str": 0
                                            }
 
-        # para MV
+    #NOTA AL PROFESOR:
+
+    # Aquí falta el directorio y contador de tipos de constantes
+    # esos los tengo declarados en Cuádruplos, sé que van aquí, pero 
+    # cambiarlos me iba a costar 1 + horas en hacerlo, decidí 
+    # dejarlos allá por conveniencia, sin embargo, estoy consciente
+    # de que se declaran aquí.
+
+        # para MV 
+        ### solo se usa en MV
         self.espacio_memoria = np.empty(20000, dtype=object)
+
+        #Numpy permite definir el tamaño de memoria a pedir a priori
+
 
 
 

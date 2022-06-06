@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from operator import indexOf
 import sys
 from typing import Any
 from Cuadruplos import Alcance, Cuadruplo
@@ -156,12 +155,10 @@ class MaquinaVirtual:
                     op1, self.obtener_valor(op2)))
                 self.guardar_valor(resultado, direccion)
             elif operacion == "hist":
-                print("JOLA")
                 tamaño = self.obtener_valor(op2)
                 arreglo_para_hist = self.obtener_arreglo(op1, tamaño)
                 plt.hist(arreglo_para_hist)
                 plt.show()
-                print(arreglo_para_hist)
                 # dim1 = self.obtener_valor(op2)
                 # dim2 = self.obtener_valor(direccion)
 
@@ -193,10 +190,10 @@ class MaquinaVirtual:
         direccion_fin = direccion_inicio + tamaño
         if prefijo == "1":
             self.memoria_global.espacio_memoria[direccion_inicio:
-                                                direccion_inicio+direccion_fin] = valor
+                                                direccion_fin] = valor
         elif prefijo == "2":
             self.memoria_stack[-1].espacio_memoria[direccion_inicio:
-                                                   direccion_inicio+direccion_fin] = valor
+                                                   direccion_fin] = valor
 
     def obtener_arreglo(self, inicio: str, tamaño: int):
         prefijo = inicio[0]
@@ -206,9 +203,9 @@ class MaquinaVirtual:
         direccion_inicio = int(inicio[1:])
         direccion_fin = direccion_inicio + tamaño
         if prefijo == "1":
-            return np.copy(self.memoria_global.espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin])
+            return np.copy(self.memoria_global.espacio_memoria[direccion_inicio:direccion_fin])
         elif prefijo == "2":
-            return np.copy(self.memoria_stack[-1].espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin])
+            return np.copy(self.memoria_stack[-1].espacio_memoria[direccion_inicio:direccion_fin])
 
     def obtener_valor(self, direccion: str):
         # checar si es apuntador

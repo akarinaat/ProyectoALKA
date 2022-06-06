@@ -1,0 +1,22 @@
+main(){
+	var int: a[11];
+
+	var int: i,j;
+	var int: aux;
+
+	read(a,"sort.csv");
+
+	for i = 0 to 11 - 1 {
+		for j = 0 to 11 - i - 1{
+			if ( a[j] > a[j+1]){
+				aux = a[j];
+				a[j] = a[j+1];
+				a[j+1] = aux;
+			};
+		};
+	};
+
+	for i = 0 to 11{
+		write(a[i]);
+	};
+}

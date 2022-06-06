@@ -57,6 +57,8 @@ ALKA_parser = Lark(
     FOR : "for"
     MAIN : "main"
    
+    COMMENT: "#" /[^\n]/*
+    %ignore COMMENT 
 
     id : ID
 
@@ -123,8 +125,6 @@ ALKA_parser = Lark(
     mode: "mode" "(" llamadavariable  ")"
 
     variance: "variance" "(" llamadavariable ")"
-
-
 
     ''',
     start='programa'

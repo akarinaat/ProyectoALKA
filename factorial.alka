@@ -1,0 +1,31 @@
+#func int factorial(f int){
+     
+ #    if (f == 0){
+  #       return 1;
+   #  } else {
+    #     return f * factorial(f-1);
+     #};
+#}
+
+func int factorialIterativo(num int)
+{
+        var int: factorial;
+        factorial = 1;
+
+ if(num == 0) {
+   		return 1;
+ };
+
+ while (num > 1) {
+   factorial = factorial * num;
+   num = num -1;
+ };
+
+    return factorial;
+
+}
+
+
+main(){
+	return factorialIterativo(5);
+}

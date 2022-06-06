@@ -1,0 +1,91 @@
+main(){
+  var int: a[3][3], b[3][3], c[3][3];
+
+  var int: x,y,z;
+
+  var int: aux;
+
+
+  # inicializar a y c con ceros
+  # y b con puros unos
+  for x = 0 to 3{
+    for y = 0 to 3{
+      a[x][y] = 0;
+      b[x][y] = 1;
+      c[x][y] = 0;
+    };
+  };
+
+
+  # hacer a la matriz identidad
+  for x = 0 to 3{
+    a[x][x] = 1;
+  };
+
+  # multiplicar las matrices
+
+  # A X B = B 
+  # B es puros unos
+
+    write("a*b = unos");
+  for x = 0 to 3{
+    for y = 0 to 3{
+      aux = 0;
+      for z = 0 to 3{
+        aux =aux + a[x][z] * b[z][y];
+      };
+      c[x][y] = aux;
+      write(c[x][y]);
+    };
+    write("");
+  };
+
+
+  write("Segunda multiplicación");
+
+  #inicializar de nuevo c
+  for x = 0 to 3{
+    for y = 0 to 3{
+      c[x][y] = 0;
+    };
+  };
+
+  # hacer a la matriz identidad x 3
+  for x = 0 to 3{
+    a[x][x] = 3;
+  };
+
+  aux = 0;
+
+  write("Definicion de b:");
+
+  #hacer b los números de 1->9
+  for x = 0 to 3{
+    for y = 0 to 3{
+      b[x][y] = aux;
+      aux = aux + 1;
+      write(b[x][y]);    
+    };
+    write("");
+
+  };
+  
+    write("resultado de a * b:");
+
+
+  # multiplicar las matrices
+  # NUNCA ALCANZA AL LÍMITE, ES DE 0 A 2
+  for x = 0 to 3{
+    for y = 0 to 3{
+      aux = 0;
+      for z = 0 to 3{
+        aux =aux + a[x][z] * b[z][y];
+      };
+      c[x][y] = aux;
+      write(c[x][y]);
+    };
+    write("");
+  };
+
+
+}

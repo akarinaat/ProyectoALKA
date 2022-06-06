@@ -304,6 +304,7 @@ class GeneracionCuadruplos:
 
 ############### EXPRESION ##################
 
+
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
 
@@ -368,7 +369,7 @@ class GeneracionCuadruplos:
             direccion_atomo = self.generar_cuadruplos_atomo(atomo)
             operacion = arbol_factor.children[0]
 
-            return self.generar_cuadruplo_nuevo(operacion, self.obtener_direccion_constante("0"), direccion_atomo )
+            return self.generar_cuadruplo_nuevo(operacion, self.obtener_direccion_constante("0"), direccion_atomo)
 
     # atomo : llamadavariable | CTEF | CTESTR | CTEI | llamadafuncion | funcionesespeciales
     def generar_cuadruplos_atomo(self, atomo):
@@ -434,7 +435,6 @@ class GeneracionCuadruplos:
 ################## ASIGNACION ##########################
     # Lega el arbol de la regla de asignacion
     # Cuadruplo de asignacion: = valor_expresion _ variable
-
 
     def generar_cuadruplos_asignacion(self, asignacion: Tree) -> Any:
         # asignacion : llamadavariable "=" expresion
@@ -543,7 +543,7 @@ class GeneracionCuadruplos:
                 lista_CTEIs_dimensiones) == 0 else [int(str(dim)) for dim in lista_CTEIs_dimensiones]
 
             tamano = reduce(mul, lista_dimensiones, 1)
-            print(tamano)
+            # print(tamano)
             cantidad_expresiones = len(lista_CTEIs_dimensiones)
 
             # Conseguir la direccion de la variable
@@ -734,6 +734,7 @@ class GeneracionCuadruplos:
 
 
 #######   FUNCIONES ESPECIALES #####
+
 
     def generar_cuadruplos_funciones_especiales(self, arbol_funcs_especiales: Tree):
 

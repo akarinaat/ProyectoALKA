@@ -1,0 +1,38 @@
+main(){
+
+    var int: a[4][2];
+    var int: i;
+    var int: b,z;
+
+    var int: sumaX, sumaX2, sumay, sumaxy;
+    sumaX = 0;
+    sumaX2 = 0;
+    sumay =0;
+    sumaxy = 0;
+
+
+    read(a, "regression.csv");
+
+    #Se calculan las sumas necesarias
+
+        for i=0 to 4{
+        sumaX = sumaX + a[i][0];
+        sumaX2 = sumaX2 + a[i][0] * a[i][0];
+        sumay = sumay + a[i][1];
+        sumaxy = sumaxy +a[i][0]*a[i][1] ;
+    };
+
+    # Se calcula la pendiente
+z = ((sumay * sumaX2 )- (sumaX * sumaxy))/ (4*sumaX2 - sumaX*sumaX);
+
+    # write(sumaX,sumaX2,sumay,sumaxy);
+
+    write("la pendiente de la regresion es: ", z);
+
+    # Se calcula la intersección con Y
+    b = (4 * sumaxy -sumaX * sumay) / (4 * sumaX2 - sumaX*sumaX);
+
+    write("la el interseccion con y de la regresion es: ", b);
+
+
+}

@@ -279,7 +279,7 @@ class AnalizadorSemantico:
                 break
 
         if variable is None:
-            raise SemanticError("Error, la variable no esta declarada")
+            raise SemanticError(f"Error, la variable {nombre_variable} no esta declarada")
         
         return variable
 
