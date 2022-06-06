@@ -2,11 +2,7 @@
 
 main(){
   
-  var int: a[3][2];
-
-  read(a,"test.csv");
-
-  return a[2][0];
+  return -5;
 
 }
 

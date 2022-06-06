@@ -451,7 +451,7 @@ class AnalizadorSemantico:
 
         if variable.tipo != Tipo.Int and variable.tipo != Tipo.Float:
                 raise SemanticError(
-                    "Histo solo se puede llamar con variable numérica")
+                    "Hist solo se puede llamar con variable numérica")
         
 
     def checar_void(self, tipo):

@@ -261,7 +261,7 @@ class GeneracionCuadruplos:
 
         # librar memoria del stack
 
-        self.memoria_stack.pop()
+        # self.memoria_stack.pop()
 
         self.generar_cuadruplos_decvars(
             arbol_decvars, Alcance.alcance_local)  # dentro de funcion es local
@@ -281,9 +281,9 @@ class GeneracionCuadruplos:
         self.generar_cuadruplos_estatutos(arbol_estatutos)
 
         self.directorio_variables_locales.pop()
+        self.memoria_stack.pop()
 
         self.generar_cuadruplo_nuevo("ENDFunc", "", "", "")
-
 
     def asignar_espacio_parametros(self, arbol_parametros: Tree) -> list[str]:
         lista_nombres = []
@@ -303,7 +303,6 @@ class GeneracionCuadruplos:
 
 
 ############### EXPRESION ##################
-
 
     def generar_cuadruplos_expresion(self, expresion: Tree) -> str:
         # regresa la dirección de donde se guardó el resultado de la expresión
@@ -366,10 +365,10 @@ class GeneracionCuadruplos:
                 return self.generar_cuadruplos_atomo(expresion)
         elif len(arbol_factor.children) == 2:
             atomo = arbol_factor.children[1]
-            valor_atomo = self.generar_cuadruplos_atomo(atomo)
+            direccion_atomo = self.generar_cuadruplos_atomo(atomo)
             operacion = arbol_factor.children[0]
 
-            return self.generar_cuadruplo_nuevo(operacion, valor_atomo, "")
+            return self.generar_cuadruplo_nuevo(operacion, self.obtener_direccion_constante("0"), direccion_atomo )
 
     # atomo : llamadavariable | CTEF | CTESTR | CTEI | llamadafuncion | funcionesespeciales
     def generar_cuadruplos_atomo(self, atomo):
@@ -435,6 +434,7 @@ class GeneracionCuadruplos:
 ################## ASIGNACION ##########################
     # Lega el arbol de la regla de asignacion
     # Cuadruplo de asignacion: = valor_expresion _ variable
+
 
     def generar_cuadruplos_asignacion(self, asignacion: Tree) -> Any:
         # asignacion : llamadavariable "=" expresion
@@ -679,7 +679,8 @@ class GeneracionCuadruplos:
 
         self.generar_cuadruplos_asignacion(arbol_asignacion_for)
         variable = arbol_asignacion_for.children[0]
-        direccion_variable , dims = self.generar_cuadruplos_llamadavariable(variable)
+        direccion_variable, dims = self.generar_cuadruplos_llamadavariable(
+            variable)
         resultado_expresion = self.generar_cuadruplos_expresion(
             arbol_expresion_for)
 
@@ -697,11 +698,13 @@ class GeneracionCuadruplos:
 
         # Incrementar la variable de control ++
         # Necesito obtener la direccion de la constante 1 para poder sumarselo (variable de control)
-        resultado_incremento = self.generar_cuadruplo_nuevo("+", direccion_variable, self.obtener_direccion_constante("1"))
-        self.generar_cuadruplo_nuevo("=", resultado_incremento, "", direccion_variable)
+        resultado_incremento = self.generar_cuadruplo_nuevo(
+            "+", direccion_variable, self.obtener_direccion_constante("1"))
+        self.generar_cuadruplo_nuevo(
+            "=", resultado_incremento, "", direccion_variable)
 
         # goto de regreso al a condicion
-        self.generar_cuadruplo_nuevo("goto",posicion_condicion, "", "")
+        self.generar_cuadruplo_nuevo("goto", posicion_condicion, "", "")
 
         # ponerle la direccion despues del for al gotof
         posicion_despues_for = len(self.listaCuadruplos)
@@ -732,7 +735,6 @@ class GeneracionCuadruplos:
 
 #######   FUNCIONES ESPECIALES #####
 
-
     def generar_cuadruplos_funciones_especiales(self, arbol_funcs_especiales: Tree):
 
         #funcionesespeciales : read | write | hist | mean | mode |  variance
@@ -756,7 +758,8 @@ class GeneracionCuadruplos:
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
 
-            d1xm1 = reduce(mul, lista_dims_args_funcesp,1) #mul es la operación de multiplicacion
+            # mul es la operación de multiplicacion
+            d1xm1 = reduce(mul, lista_dims_args_funcesp, 1)
 
             # self.generar_cuadruplo_nuevo("ERA", "read", "", "")
 
@@ -764,66 +767,71 @@ class GeneracionCuadruplos:
             #     self.generar_cuadruplo_nuevo(
             #         "DIM", self.obtener_direccion_constante(str(dim)), "", "")
 
-            # tiene el nombre de la funcion, dirección del argumento, direccion de la constante (str) que tiene el nombre 
-            # del archivo, el tamaño de la variable 
+            # tiene el nombre de la funcion, dirección del argumento, direccion de la constante (str) que tiene el nombre
+            # del archivo, el tamaño de la variable
             # funcEsp.children[1] --> nombre del archivo
             self.generar_cuadruplo_nuevo(
                 "read", direccion_argumento, self.obtener_direccion_ctestring(funcEsp.children[1]), self.obtener_direccion_constante(d1xm1))
 
             return -1  # porque es void :)
-        
+
         elif funcEsp.data == "mean":
-            #1  mean: "mean" "(" llamadavariable ")"
-            llamada_variable = funcEsp.children[0] # este ya es el mean
+            # 1  mean: "mean" "(" llamadavariable ")"
+            llamada_variable = funcEsp.children[0]  # este ya es el mean
 
-            #2 direccion 
+            # 2 direccion
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
-            
-            tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+
+            tamaño = reduce(mul, lista_dims_args_funcesp, 1)
             direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("mean",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
-                                                                            # solito lo genera 
+            # como no le mando en donde lo va a guardar
+            return self.generar_cuadruplo_nuevo("mean", direccion_argumento, direccion_tamaño)
+            # solito lo genera
         elif funcEsp.data == "mode":
-               #1  mean: "mean" "(" llamadavariable ")"
-            llamada_variable = funcEsp.children[0] # este ya es el mode
+            # 1  mean: "mean" "(" llamadavariable ")"
+            llamada_variable = funcEsp.children[0]  # este ya es el mode
 
-            #2 direccion 
+            # 2 direccion
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
-            
-            tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+
+            tamaño = reduce(mul, lista_dims_args_funcesp, 1)
             direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("mode",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
-                                                                            # solito lo genera 
+            # como no le mando en donde lo va a guardar
+            return self.generar_cuadruplo_nuevo("mode", direccion_argumento, direccion_tamaño)
+            # solito lo genera
         elif funcEsp.data == "variance":
-            #1  mean: "mean" "(" llamadavariable ")"
-            llamada_variable = funcEsp.children[0] # este ya es del variance
+            # 1  mean: "mean" "(" llamadavariable ")"
+            llamada_variable = funcEsp.children[0]  # este ya es del variance
 
-            #2 direccion 
+            # 2 direccion
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
-            
-            tamaño = reduce(mul, lista_dims_args_funcesp,1) 
+
+            tamaño = reduce(mul, lista_dims_args_funcesp, 1)
             direccion_tamaño = self.obtener_direccion_constante(tamaño)
 
-            return self.generar_cuadruplo_nuevo("variance",direccion_argumento,direccion_tamaño) #como no le mando en donde lo va a guardar
-        
+            # como no le mando en donde lo va a guardar
+            return self.generar_cuadruplo_nuevo("variance", direccion_argumento, direccion_tamaño)
+
         elif funcEsp.data == "hist":
-            
-             #1  mean: "mean" "(" llamadavariable ")"
-            llamada_variable = funcEsp.children[0] # este ya es del variance  
-            #2 direccion 
+
+            # 1  mean: "mean" "(" llamadavariable ")"
+            llamada_variable = funcEsp.children[0]  # este ya es del variance
+            # 2 direccion
             direccion_argumento, lista_dims_args_funcesp = self.generar_cuadruplos_llamadavariable(
                 llamada_variable)
-            direccion_dim1= self.obtener_direccion_constante(str(lista_dims_args_funcesp[0]))
+            direccion_dim1 = self.obtener_direccion_constante(
+                str(lista_dims_args_funcesp[0]))
             # direccion_dim2= self.obtener_direccion_constante(str(lista_dims_args_funcesp[1]))
-                #porque ya no hay matriz, se quedó cmo arreglo
+            # porque ya no hay matriz, se quedó cmo arreglo
 
-            self.generar_cuadruplo_nuevo("hist",direccion_argumento,direccion_dim1,"")                                                                 # solito lo genera 
-
+            # solito lo genera
+            self.generar_cuadruplo_nuevo(
+                "hist", direccion_argumento, direccion_dim1, "")
 
 
 if __name__ == "__main__":

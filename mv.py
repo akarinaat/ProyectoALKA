@@ -116,8 +116,8 @@ class MaquinaVirtual:
                 # Checar si es el  del main
                 if len(self.stack_direcciones_return) == 0:
                     # Imprimir resultado a consola
-                    print(resultado, "El resultado!")
-                    return resultado
+                    print(resultado)
+                    return resultado  # para pruebas
 
                 donde_guardar_resultado = self.stack_direcciones_return.pop()
 
@@ -146,7 +146,7 @@ class MaquinaVirtual:
                     op1, self.obtener_valor(op2)))
                 self.guardar_valor(resultado, direccion)
             elif operacion == "mode":
-                vals,counts = np.unique(self.obtener_arreglo(
+                vals, counts = np.unique(self.obtener_arreglo(
                     op1, self.obtener_valor(op2)), return_counts=True)
                 index = np.argmax(counts)
                 self.guardar_valor(vals[index], direccion)
@@ -173,17 +173,18 @@ class MaquinaVirtual:
                 # plt.hist()
             elif operacion == "read":
                 direccion_arg = op1
-                nombre_arch = self.obtener_valor(op2)[1:-1] # para quitar comillas
+                nombre_arch = self.obtener_valor(
+                    op2)[1:-1]  # para quitar comillas
                 tamano = self.obtener_valor(direccion)
 
                 # puse el [:tamano] para asegurar que solo la cantidad de
                 # datos correctos se escriban.
-                datos = np.loadtxt(nombre_arch,delimiter=",",dtype=np.number).flatten()[:tamano]
+                datos = np.loadtxt(nombre_arch, delimiter=",",
+                                   dtype=np.number).flatten()[:tamano]
 
-                self.guardar_arreglo(direccion_arg,tamano,datos)
-  
-  
-    def guardar_arreglo(self, inicio: str, tamaño: int,valor):
+                self.guardar_arreglo(direccion_arg, tamano, datos)
+
+    def guardar_arreglo(self, inicio: str, tamaño: int, valor):
         prefijo = inicio[0]
         if prefijo == "(":
             inicio = str(self.obtener_valor(inicio[1:-1]))
@@ -191,9 +192,11 @@ class MaquinaVirtual:
         direccion_inicio = int(inicio[1:])
         direccion_fin = direccion_inicio + tamaño
         if prefijo == "1":
-            self.memoria_global.espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin]= valor
+            self.memoria_global.espacio_memoria[direccion_inicio:
+                                                direccion_inicio+direccion_fin] = valor
         elif prefijo == "2":
-            self.memoria_stack[-1].espacio_memoria[direccion_inicio:direccion_inicio+direccion_fin] = valor
+            self.memoria_stack[-1].espacio_memoria[direccion_inicio:
+                                                   direccion_inicio+direccion_fin] = valor
 
     def obtener_arreglo(self, inicio: str, tamaño: int):
         prefijo = inicio[0]

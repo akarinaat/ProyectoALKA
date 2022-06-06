@@ -90,7 +90,7 @@ ALKA_parser = Lark(
 
     estatutos : estatuto*
 
-    estatuto : (asignacion |  expresion | if | while | forloop | return) ";" 
+    estatuto : (return| asignacion |  expresion | if | while | forloop  ) ";" 
 
     return : "return" expresion
 
