@@ -63,6 +63,8 @@ class AnalizadorSemantico:
             elif subtree.data == "main":
                 self.analizar_main(subtree)
 
+######## Analizar programa ########################
+
     def analizar_main(self, arbol_main: Tree):
         # main : "main" "(" ")" "{" decvars estatutos "}"
         arbol_decvars_main = arbol_main.children[0]
@@ -149,7 +151,6 @@ class AnalizadorSemantico:
 # A cada función de analizar le llega el arbol que le corresponde
 # Se asigna una a variable al valor de los nodos
 #    Se analizan los valores
-
 
     def analizar_estatutos(self, estatutos: List[Tree]) -> List[Tipo]:
         results: List[Tipo] = []
@@ -389,6 +390,9 @@ class AnalizadorSemantico:
             raise SemanticError("Variable tiene que ser entero")
 
         return self.analizar_estatutos(arbol_estaturos_for.children)
+
+
+######### Analizar funciones especiales #########
 
     def analizar_funcionesespeciales(self, arbol_funcionesespeciales: Tree) -> Tipo:
         #funcionesespeciales : read | write | hist | mean | mode | avg | variance | print

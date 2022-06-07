@@ -21,11 +21,11 @@ class MaquinaVirtual:
         self.memoria_constantes = np.empty(5000, dtype=object)
         self.stack_direcciones_return = []
         self.pila_brincos_endFunc = []
+
         self.instruccion_actual = 0
 
         self.memoria_global = Memoria()
-        self.memoria_stack: list[Memoria] = [
-            Memoria()]  # La memoria inicial es del main
+        self.memoria_stack: list[Memoria] = [ Memoria()]  # La memoria inicial es del main
 
         self.memoria_funcion_a_llamar: Memoria = None
 

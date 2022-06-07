@@ -192,13 +192,7 @@ class GeneracionCuadruplos:
         # param 0 t0
         # param 1 t1
         # call foo 2 t2 ---> AHORA SERÁ CALL LA DIRECCIÓN DE FOO
-
-        # Encontrar el valor de todos los argumentos (donde se va a guardar el resultado)
-        # lista_resultados_expresiones = []
-        # for expresion in lista_expresion_llamadafuncion:
-        #     res = self.generar_cuadruplos_expresion(expresion)
-        #     lista_resultados_expresiones.append(res)
-
+        
         # 1. Conseguir la dirección de los resultados de los argumentos
         # func(2+3,5)
         # + 2 3 t1
@@ -243,11 +237,6 @@ class GeneracionCuadruplos:
         arbol_parametros = arbol_decfunc.children[2]
         arbol_decvars = arbol_decfunc.children[3]
         arbol_estatutos = arbol_decfunc.children[4]
-
-        # decfunc tipo nombre  ERA (para la MV)
-        # TODO FALTA ERA
-        # self.generar_cuadruplo_nuevo(
-        #     "decfunc", tipo_decfunc, nombre_decfunc, "")
 
         # Para saber en qué cuadruplo voy
         posicion_inicio = len(self.listaCuadruplos)
@@ -452,7 +441,11 @@ class GeneracionCuadruplos:
    # llamadavariable : id ("[" expresion "]" )*
     def generar_cuadruplos_llamadavariable(self, arbol_llamadavariable: Tree):
 
+        # OBTENER EL NOMBRE DE LA VARIABLE DE LA LLAMADA VARIABLE
         id_var = arbol_llamadavariable.children[0].children[0]
+
+
+        #OBTENER LA DIRECCIÓN Y LAS DIMENSIONES DE DICHA VARIABLE
         if id_var in self.directorio_variables_locales[-1]:
             direccion_variable, lista_dimensiones = self.directorio_variables_locales[-1][id_var]
         elif id_var in self.directorio_variables_globales:
@@ -568,15 +561,6 @@ class GeneracionCuadruplos:
             else:
                 raise SemanticError("Error al compilar, alcance no definido")
 
-            # generar los cuádruplos de las expresiones de las dimensiones
-            # temporales_dimensiones = [
-            #     self.generar_cuadruplos_expresion(expresion)
-            #     for expresion in lista_CTEIs_dimensiones
-            # ]
-
-            # dimensiones_str = str(temporales_dimensiones)
-            # self.generar_cuadruplo_nuevo(
-            #     "decvar", tipo, dimensiones_str, str(nombre))
 
     # while : "while" "(" expresion ")" "{" estatutos "}"
 
@@ -591,6 +575,9 @@ class GeneracionCuadruplos:
         # Prefijo variables locales es "2"
         self.directorio_variables_locales[-1][nombre] = ("2" +
                                                          str(direccion_variable), lista_dimensiones)
+
+
+############# ESTATUTOS CONDICIONALES ###############
 
     def generar_cuadruplos_while(self, arbol_while: Tree):
         arbol_expresion_while = arbol_while.children[0]

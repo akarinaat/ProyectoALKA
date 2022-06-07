@@ -25,7 +25,6 @@ func int factorialIterativo(num int)
 
 }
 
-
 main(){
 	return factorialIterativo(5);
 }

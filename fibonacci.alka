@@ -1,31 +1,30 @@
-#func int fibonacci(n int){
+func int fibonacci(n int){
 
-    #if(n<2){
-    #    return n;
-   # }else{
-  #      return fibonacci(n-1) + fibonacci(n-2);
- #   };
+    if(n<2){
+        return n;
+    }else{
+        return fibonacci(n-1) + fibonacci(n-2);
+    };
 
-#}
+ }
 
-func int fibonacciIterativo(limite int)
-{
-     var int: n1 , n2, i;
-      n1 = 0;
-      n2 = 1;
+# func int fibonacciIterativo(limite int)
+# {
+#     var int: n1 , n2, i;
+ #     n1 = 0;
+  #    n2 = 1;
 	
-       for i = 0 to limite-1{
-            n2 = n1 + n2;
-            n1 = n2 - n1;
+   #    for i = 0 to limite-1{
+    #        n2 = n1 + n2;
+     #       n1 = n2 - n1;
            
-  };
+ # };
 
-  return n2;
+  # return n2;
 
-}
-
+# }
 
  main(){
 
-	return fibonacciIterativo(10);
+	return fibonacci(10);
 }
